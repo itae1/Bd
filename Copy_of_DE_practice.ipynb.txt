@@ -1,0 +1,5984 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "collapsed_sections": [
+        "OCPHygOqJV21",
+        "7s9am_wdCzcU",
+        "FfWWiFu4ZQfq",
+        "4ubM-dadaQ8j",
+        "H6X9anJcdrDh",
+        "fOkf0NxLfmyC",
+        "AdBer4GYhE9t",
+        "6Ufhpdgp6RJu",
+        "Ql51CMyDQk_C",
+        "0cXsIIsWR_vo",
+        "k9vBzmb3THZU",
+        "R7Xz9y6hChSM",
+        "D1m8IbDjCgg-",
+        "B7lxohNICgd_",
+        "fH-_QhQlJyKu",
+        "fGarG42GJxeR",
+        "n26bK1hKMqt0",
+        "mO459xYKPNe_",
+        "e8YJ8-b1Qmtr",
+        "Un2wCTXLRCfV",
+        "dOB1n9YrTU95",
+        "-zIWrfd0bkfQ",
+        "3zJqfHfdbkaK",
+        "cr5wvKD-bj-l",
+        "DMqGCzj7diVw",
+        "uWflsT-qKHmH",
+        "BjMZl6HFLwhd",
+        "uaAW1ZYwliWf",
+        "Y3CpNcAAliR0",
+        "VmtPP393mQyQ",
+        "1__Dw9BXnWW-"
+      ]
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 1"
+      ],
+      "metadata": {
+        "id": "OCPHygOqJV21"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. Write a program to demonstrate pyspark RDD transformations"
+      ],
+      "metadata": {
+        "id": "Ec1qiJioNXRB"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "spark = SparkSession.builder.appName('Exams12').getOrCreate()\n",
+        "\n",
+        "data = [\"apple\", \"banana\", \"orange\", \"apricot\", \"avocado\"]\n",
+        "\n",
+        "rdd = spark.sparkContext.parallelize(data)\n",
+        "\n",
+        "# map\n",
+        "rdd_map = rdd.map(lambda x: x.upper())\n",
+        "\n",
+        "# filter\n",
+        "rdd_filter = rdd.filter(lambda x: x.startswith('a'))\n",
+        "\n",
+        "# flatmap\n",
+        "rdd_flatmap = rdd.flatMap(lambda x: list(x))\n",
+        "\n",
+        "print('Map: ', rdd_map.collect())\n",
+        "print('Filter :', rdd_filter.collect())\n",
+        "print('Flatmap: ', rdd_flatmap.collect())"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "VGKszphUPWKs",
+        "outputId": "204742dd-4b9d-4dea-b476-75d1bf09cb88"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Map:  ['APPLE', 'BANANA', 'ORANGE', 'APRICOT', 'AVOCADO']\n",
+            "Filter : ['apple', 'apricot', 'avocado']\n",
+            "Flatmap:  ['a', 'p', 'p', 'l', 'e', 'b', 'a', 'n', 'a', 'n', 'a', 'o', 'r', 'a', 'n', 'g', 'e', 'a', 'p', 'r', 'i', 'c', 'o', 't', 'a', 'v', 'o', 'c', 'a', 'd', 'o']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. Program to demonstrate RDD pyspark actions"
+      ],
+      "metadata": {
+        "id": "CvafBzeNPWE8"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from operator import add\n",
+        "\n",
+        "data1 = [('Z', 10), ('A', 20), ('B', 30), ('C', 40), ('D', 50), ('B', 60)]\n",
+        "data2 = [1,2,3,5,6,4,3,2]\n",
+        "\n",
+        "rdd1 = spark.sparkContext.parallelize(data1)\n",
+        "rdd2 = spark.sparkContext.parallelize(data2)\n",
+        "\n",
+        "# aggregate\n",
+        "seqOp = lambda x,y: x+y\n",
+        "comboOp = lambda x,y: x+y\n",
+        "agg = rdd2.aggregate(0, seqOp, comboOp)\n",
+        "print('Aggregate: ', agg)\n",
+        "\n",
+        "# reduce\n",
+        "reduce_result = rdd1.reduce(add)\n",
+        "print('Reduce: ', reduce_result)\n",
+        "\n",
+        "# Fold\n",
+        "fold_result = rdd2.fold(0, add)\n",
+        "print('Fold: ', fold_result)\n",
+        "\n",
+        "# treeReduce\n",
+        "treereduce_result = rdd2.treeReduce(add)\n",
+        "print('Tree Reduce: ', treereduce_result)\n",
+        "\n",
+        "# count\n",
+        "count_result = rdd2.count()\n",
+        "print('Count:', count_result)\n",
+        "\n",
+        "# min\n",
+        "min_result = rdd2.min()\n",
+        "print(\"Min Result:\", min_result)\n",
+        "\n",
+        "# max\n",
+        "max_result = rdd2.max()\n",
+        "print(\"Max Result:\",max_result)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "nGSW84vvPWAW",
+        "outputId": "c003f4b5-b27a-4cbe-fe1d-34d218f27471"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Aggregate:  26\n",
+            "Reduce:  ('Z', 10, 'A', 20, 'B', 30, 'C', 40, 'D', 50, 'B', 60)\n",
+            "Fold:  26\n",
+            "Tree Reduce:  26\n",
+            "Count: 8\n",
+            "Min Result: 1\n",
+            "Max Result: 6\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. program to demonstrate dataframe column rename operations"
+      ],
+      "metadata": {
+        "id": "9eZEAWrOPV8D"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()\n",
+        "\n",
+        "data = [\n",
+        "    (1, \"PHP\", \"Sravan\", 250),\n",
+        "    (2, \"SQL\", \"Chandra\", 300),\n",
+        "    (3, \"Python\", \"Harsha\", 250),\n",
+        "    (4, \"R\", \"Rohith\", 1200),\n",
+        "    (5, \"Hadoop\", \"Manasa\", 700)\n",
+        "]\n",
+        "\n",
+        "columnName = [\"Book_Id\", \"Book_Name\", \"Author\", \"Price\"]\n",
+        "\n",
+        "df = spark.createDataFrame(data, columnName)\n",
+        "df.show()\n",
+        "\n",
+        "# Rename 1\n",
+        "df1 = df.withColumnRenamed(\"Author\", 'Writer')\n",
+        "df1.show()\n",
+        "\n",
+        "df2 = df.withColumnRenamed('Book_Name', 'Title') \\\n",
+        "  .withColumnRenamed('Price', 'cost')\n",
+        "df2.show()\n",
+        "\n",
+        "df3 = df.withColumnsRenamed({'Book_Name': 'title', 'Price':'cost', 'Author':'writer'})\n",
+        "df3.show()\n",
+        "\n",
+        "new_cols = ['ID', 'TITLE', 'WRITER', 'COST']\n",
+        "df4 = df.toDF(*new_cols)\n",
+        "df4.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "YddO39bXXnkK",
+        "outputId": "3d1c7625-27fd-4899-f9f8-1b169d01af3f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+---------+-------+-----+\n",
+            "|Book_Id|Book_Name| Author|Price|\n",
+            "+-------+---------+-------+-----+\n",
+            "|      1|      PHP| Sravan|  250|\n",
+            "|      2|      SQL|Chandra|  300|\n",
+            "|      3|   Python| Harsha|  250|\n",
+            "|      4|        R| Rohith| 1200|\n",
+            "|      5|   Hadoop| Manasa|  700|\n",
+            "+-------+---------+-------+-----+\n",
+            "\n",
+            "+-------+---------+-------+-----+\n",
+            "|Book_Id|Book_Name| Writer|Price|\n",
+            "+-------+---------+-------+-----+\n",
+            "|      1|      PHP| Sravan|  250|\n",
+            "|      2|      SQL|Chandra|  300|\n",
+            "|      3|   Python| Harsha|  250|\n",
+            "|      4|        R| Rohith| 1200|\n",
+            "|      5|   Hadoop| Manasa|  700|\n",
+            "+-------+---------+-------+-----+\n",
+            "\n",
+            "+-------+------+-------+----+\n",
+            "|Book_Id| Title| Author|cost|\n",
+            "+-------+------+-------+----+\n",
+            "|      1|   PHP| Sravan| 250|\n",
+            "|      2|   SQL|Chandra| 300|\n",
+            "|      3|Python| Harsha| 250|\n",
+            "|      4|     R| Rohith|1200|\n",
+            "|      5|Hadoop| Manasa| 700|\n",
+            "+-------+------+-------+----+\n",
+            "\n",
+            "+-------+------+-------+----+\n",
+            "|Book_Id| title| writer|cost|\n",
+            "+-------+------+-------+----+\n",
+            "|      1|   PHP| Sravan| 250|\n",
+            "|      2|   SQL|Chandra| 300|\n",
+            "|      3|Python| Harsha| 250|\n",
+            "|      4|     R| Rohith|1200|\n",
+            "|      5|Hadoop| Manasa| 700|\n",
+            "+-------+------+-------+----+\n",
+            "\n",
+            "+---+------+-------+----+\n",
+            "| ID| TITLE| WRITER|COST|\n",
+            "+---+------+-------+----+\n",
+            "|  1|   PHP| Sravan| 250|\n",
+            "|  2|   SQL|Chandra| 300|\n",
+            "|  3|Python| Harsha| 250|\n",
+            "|  4|     R| Rohith|1200|\n",
+            "|  5|Hadoop| Manasa| 700|\n",
+            "+---+------+-------+----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### D. Pyspark program to demonstrate pyspark withcolumns operations with options"
+      ],
+      "metadata": {
+        "id": "7_BW2zBOXnYB"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col, lit, when"
+      ],
+      "metadata": {
+        "id": "JfcQOGvN8icJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    ('James', 'Smith', '1991-04-01', 'M', 3000),\n",
+        "    ('Anna', 'Rose', '1988-11-23', 'F', 4100),\n",
+        "    ('Robert', 'Williams', '1995-07-30', 'M', 6200),\n",
+        "    ('Maria', 'Jones', '1993-01-15', 'F', 3600),\n",
+        "    ('David', 'Brown', '1990-08-19', 'M', 5200)\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "Un2WoEnf8iY9"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['firstname', 'lastname', 'dob', 'gender', 'salary']\n",
+        "df = spark.createDataFrame(data= data, schema=columns)"
+      ],
+      "metadata": {
+        "id": "RG6TPZyr8iVs"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.printSchema()\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "tFbWQO4l9UGW",
+        "outputId": "2b6c755b-3c4f-4b57-9c8b-afeb044d6605"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "root\n",
+            " |-- firstname: string (nullable = true)\n",
+            " |-- lastname: string (nullable = true)\n",
+            " |-- dob: string (nullable = true)\n",
+            " |-- gender: string (nullable = true)\n",
+            " |-- salary: long (nullable = true)\n",
+            "\n",
+            "+---------+--------+----------+------+------+\n",
+            "|firstname|lastname|       dob|gender|salary|\n",
+            "+---------+--------+----------+------+------+\n",
+            "|    James|   Smith|1991-04-01|     M|  3000|\n",
+            "|     Anna|    Rose|1988-11-23|     F|  4100|\n",
+            "|   Robert|Williams|1995-07-30|     M|  6200|\n",
+            "|    Maria|   Jones|1993-01-15|     F|  3600|\n",
+            "|    David|   Brown|1990-08-19|     M|  5200|\n",
+            "+---------+--------+----------+------+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Arithmetic\n",
+        "df2 = df.withColumn('new_Salary', col('salary')*5)\n",
+        "df2.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "a1VtRpdZ9UDi",
+        "outputId": "158dfe16-fa2f-4a16-b870-a5e3f26e0b82"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+----------+------+------+----------+\n",
+            "|firstname|lastname|       dob|gender|salary|new_Salary|\n",
+            "+---------+--------+----------+------+------+----------+\n",
+            "|    James|   Smith|1991-04-01|     M|  3000|     15000|\n",
+            "|     Anna|    Rose|1988-11-23|     F|  4100|     20500|\n",
+            "|   Robert|Williams|1995-07-30|     M|  6200|     31000|\n",
+            "|    Maria|   Jones|1993-01-15|     F|  3600|     18000|\n",
+            "|    David|   Brown|1990-08-19|     M|  5200|     26000|\n",
+            "+---------+--------+----------+------+------+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# lit operation\n",
+        "df3 = df.withColumn('country', lit('USA'))\n",
+        "df3.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "g9jYkPAr9UBd",
+        "outputId": "b2c391f9-3a85-4889-ffee-02d4cedb27d7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+----------+------+------+-------+\n",
+            "|firstname|lastname|       dob|gender|salary|country|\n",
+            "+---------+--------+----------+------+------+-------+\n",
+            "|    James|   Smith|1991-04-01|     M|  3000|    USA|\n",
+            "|     Anna|    Rose|1988-11-23|     F|  4100|    USA|\n",
+            "|   Robert|Williams|1995-07-30|     M|  6200|    USA|\n",
+            "|    Maria|   Jones|1993-01-15|     F|  3600|    USA|\n",
+            "|    David|   Brown|1990-08-19|     M|  5200|    USA|\n",
+            "+---------+--------+----------+------+------+-------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Sql operation\n",
+        "df4 = df.withColumn('Salary mark ', when(col('salary') > 4000, 'High').when(col('salary') < 1500, 'Low').otherwise('Medium'))\n",
+        "df4.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "YXkkhxEj9T_l",
+        "outputId": "a8a1298e-42a9-4761-d7a8-59c86b2e2ac4"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+----------+------+------+------------+\n",
+            "|firstname|lastname|       dob|gender|salary|Salary mark |\n",
+            "+---------+--------+----------+------+------+------------+\n",
+            "|    James|   Smith|1991-04-01|     M|  3000|      Medium|\n",
+            "|     Anna|    Rose|1988-11-23|     F|  4100|        High|\n",
+            "|   Robert|Williams|1995-07-30|     M|  6200|        High|\n",
+            "|    Maria|   Jones|1993-01-15|     F|  3600|      Medium|\n",
+            "|    David|   Brown|1990-08-19|     M|  5200|        High|\n",
+            "+---------+--------+----------+------+------+------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Boolean Evaluation\n",
+        "df5 = df.withColumn('Is_high_paid', col('salary') > 5000)\n",
+        "df5.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9-rpWy0O9T69",
+        "outputId": "42cc1349-754c-40a4-cbfd-11acf437d6c6"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+----------+------+------+------------+\n",
+            "|firstname|lastname|       dob|gender|salary|Is_high_paid|\n",
+            "+---------+--------+----------+------+------+------------+\n",
+            "|    James|   Smith|1991-04-01|     M|  3000|       false|\n",
+            "|     Anna|    Rose|1988-11-23|     F|  4100|       false|\n",
+            "|   Robert|Williams|1995-07-30|     M|  6200|        true|\n",
+            "|    Maria|   Jones|1993-01-15|     F|  3600|       false|\n",
+            "|    David|   Brown|1990-08-19|     M|  5200|        true|\n",
+            "+---------+--------+----------+------+------+------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# rename operation\n",
+        "df.withColumnRenamed('gender', 'sex').show()\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qJ1Hpo_D9T5T",
+        "outputId": "5391fc2a-e373-451b-a4d7-27a4b026279b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+----------+---+------+\n",
+            "|firstname|lastname|       dob|sex|salary|\n",
+            "+---------+--------+----------+---+------+\n",
+            "|    James|   Smith|1991-04-01|  M|  3000|\n",
+            "|     Anna|    Rose|1988-11-23|  F|  4100|\n",
+            "|   Robert|Williams|1995-07-30|  M|  6200|\n",
+            "|    Maria|   Jones|1993-01-15|  F|  3600|\n",
+            "|    David|   Brown|1990-08-19|  M|  5200|\n",
+            "+---------+--------+----------+---+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### E. program to demonstrate pyspark pivot and unpivot dataframe"
+      ],
+      "metadata": {
+        "id": "JZ-8UjRU9TzZ"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import sum, expr"
+      ],
+      "metadata": {
+        "id": "V0dLiVxDAy-w"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"ProductA\", \"East\", \"Q1\", 100),\n",
+        "    (\"ProductA\", \"East\", \"Q2\", 120),\n",
+        "    (\"ProductA\", \"West\", \"Q1\", 90),\n",
+        "    (\"ProductA\", \"West\", \"Q2\", 110),\n",
+        "    (\"ProductB\", \"East\", \"Q1\", 150),\n",
+        "    (\"ProductB\", \"East\", \"Q2\", 160),\n",
+        "    (\"ProductB\", \"West\", \"Q1\", 140),\n",
+        "    (\"ProductB\", \"West\", \"Q2\", 130),\n",
+        "    (\"ProductC\", \"East\", \"Q1\", 200),\n",
+        "    (\"ProductC\", \"East\", \"Q2\", 210),\n",
+        "    (\"ProductC\", \"West\", \"Q1\", 190),\n",
+        "    (\"ProductC\", \"West\", \"Q2\", 220),\n",
+        "    (\"ProductD\", \"East\", \"Q1\", 170),\n",
+        "    (\"ProductD\", \"West\", \"Q1\", 165),\n",
+        "    (\"ProductD\", \"West\", \"Q2\", 180),\n",
+        "]\n"
+      ],
+      "metadata": {
+        "id": "2pWFLny0BOBy"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['Product', 'Region', 'Quarter', 'Price']"
+      ],
+      "metadata": {
+        "id": "N_00kd7QBjig"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data = data, schema=columns)"
+      ],
+      "metadata": {
+        "id": "DhOyywmIBt-q"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "NNafnNXEBxvu",
+        "outputId": "fe988834-6bc6-4448-e6fc-6e63866d4512"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+--------+------+-------+-----+\n",
+            "| Product|Region|Quarter|Price|\n",
+            "+--------+------+-------+-----+\n",
+            "|ProductA|  East|     Q1|  100|\n",
+            "|ProductA|  East|     Q2|  120|\n",
+            "|ProductA|  West|     Q1|   90|\n",
+            "|ProductA|  West|     Q2|  110|\n",
+            "|ProductB|  East|     Q1|  150|\n",
+            "|ProductB|  East|     Q2|  160|\n",
+            "|ProductB|  West|     Q1|  140|\n",
+            "|ProductB|  West|     Q2|  130|\n",
+            "|ProductC|  East|     Q1|  200|\n",
+            "|ProductC|  East|     Q2|  210|\n",
+            "|ProductC|  West|     Q1|  190|\n",
+            "|ProductC|  West|     Q2|  220|\n",
+            "|ProductD|  East|     Q1|  170|\n",
+            "|ProductD|  West|     Q1|  165|\n",
+            "|ProductD|  West|     Q2|  180|\n",
+            "+--------+------+-------+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Pivot operations\n",
+        "pivot_df = df.groupBy('Product').pivot('Region').sum('Price')\n",
+        "pivot_df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jfYaV_KOBybL",
+        "outputId": "bdc0aefc-250d-4e71-c766-4611d3c61783"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+--------+----+----+\n",
+            "| Product|East|West|\n",
+            "+--------+----+----+\n",
+            "|ProductB| 310| 270|\n",
+            "|ProductC| 410| 410|\n",
+            "|ProductD| 170| 345|\n",
+            "|ProductA| 220| 200|\n",
+            "+--------+----+----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Unpivot Operations\n",
+        "num_regions = 2\n",
+        "unpivot_expr = \"stack ({0}, 'East', east, 'West', west) as (Region, Sales)\".format(num_regions)\n",
+        "\n",
+        "unpivot_df = pivot_df.selectExpr('Product', unpivot_expr)"
+      ],
+      "metadata": {
+        "id": "nG58zYIQB8ns"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "unpivot_df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "4-rU6CKFCyGW",
+        "outputId": "4febcb1f-eec5-43bd-fffa-fee7c89a9fd5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+--------+------+-----+\n",
+            "| Product|Region|Sales|\n",
+            "+--------+------+-----+\n",
+            "|ProductB|  East|  310|\n",
+            "|ProductB|  West|  270|\n",
+            "|ProductC|  East|  410|\n",
+            "|ProductC|  West|  410|\n",
+            "|ProductD|  East|  170|\n",
+            "|ProductD|  West|  345|\n",
+            "|ProductA|  East|  220|\n",
+            "|ProductA|  West|  200|\n",
+            "+--------+------+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 2"
+      ],
+      "metadata": {
+        "id": "7s9am_wdCzcU"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. Program to demonstrate DataFrame Sorting operations"
+      ],
+      "metadata": {
+        "id": "xRFzxHBcDBnU"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col"
+      ],
+      "metadata": {
+        "id": "0ElnqDaYHmLY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"James\", \"sales\", \"NY\", 90000, 34, 10000),\n",
+        "    (\"Micheal\", \"sales\", \"NY\", 86000, 56, 20000),\n",
+        "    (\"Robert\", \"sales\", \"CA\", 81000, 30, 23000),\n",
+        "    (\"Maria\", \"finance\", \"CA\", 90000, 24, 23000),\n",
+        "    (\"Jen\", \"finance\", \"NY\", 79000, 53, 15000),\n",
+        "    (\"Jeff\", \"marketing\", \"CA\", 80000, 25, 18000),\n",
+        "    (\"Kumar\", \"marketing\", \"NY\", 91000, 50, 21000),\n",
+        "    (\"Saif\", \"IT\", \"CA\", 72000, 31, 22000),\n",
+        "    (\"Raj\", \"IT\", \"NY\", 65000, 29, 17000),\n",
+        "    (\"Alex\", \"HR\", \"CA\", 78000, 28, 11000),\n",
+        "    (\"Sara\", \"HR\", \"NY\", 75000, 27, 14000),\n",
+        "    (\"Mona\", \"Legal\", \"CA\", 87000, 45, 12000),\n",
+        "    (\"Nina\", \"Legal\", \"NY\", 93000, 38, 16000),\n",
+        "    (\"John\", \"Operations\", \"CA\", 82000, 33, 21000),\n",
+        "    (\"David\", \"Operations\", \"NY\", 84000, 49, 19000),\n",
+        "]\n"
+      ],
+      "metadata": {
+        "id": "cBR9iXFmH3vb"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['Name', 'Department', 'location', 'salary', 'Age', 'bonus']\n",
+        "\n",
+        "df = spark.createDataFrame(data = data, schema = columns)\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "_eFG12ahH5mv",
+        "outputId": "8d6825b0-ddbd-4971-fa8e-98abb9d6cdec"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Name|Department|location|salary|Age|bonus|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|  James|     sales|      NY| 90000| 34|10000|\n",
+            "|Micheal|     sales|      NY| 86000| 56|20000|\n",
+            "| Robert|     sales|      CA| 81000| 30|23000|\n",
+            "|  Maria|   finance|      CA| 90000| 24|23000|\n",
+            "|    Jen|   finance|      NY| 79000| 53|15000|\n",
+            "|   Jeff| marketing|      CA| 80000| 25|18000|\n",
+            "|  Kumar| marketing|      NY| 91000| 50|21000|\n",
+            "|   Saif|        IT|      CA| 72000| 31|22000|\n",
+            "|    Raj|        IT|      NY| 65000| 29|17000|\n",
+            "|   Alex|        HR|      CA| 78000| 28|11000|\n",
+            "|   Sara|        HR|      NY| 75000| 27|14000|\n",
+            "|   Mona|     Legal|      CA| 87000| 45|12000|\n",
+            "|   Nina|     Legal|      NY| 93000| 38|16000|\n",
+            "|   John|Operations|      CA| 82000| 33|21000|\n",
+            "|  David|Operations|      NY| 84000| 49|19000|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Sorting with Age\n",
+        "df.sort('Age').show()\n",
+        "df.sort(col('Age').desc()).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "AYVXe6q2IEf1",
+        "outputId": "9576b303-254a-4fce-e307-00be4004eda8"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Name|Department|location|salary|Age|bonus|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|  Maria|   finance|      CA| 90000| 24|23000|\n",
+            "|   Jeff| marketing|      CA| 80000| 25|18000|\n",
+            "|   Sara|        HR|      NY| 75000| 27|14000|\n",
+            "|   Alex|        HR|      CA| 78000| 28|11000|\n",
+            "|    Raj|        IT|      NY| 65000| 29|17000|\n",
+            "| Robert|     sales|      CA| 81000| 30|23000|\n",
+            "|   Saif|        IT|      CA| 72000| 31|22000|\n",
+            "|   John|Operations|      CA| 82000| 33|21000|\n",
+            "|  James|     sales|      NY| 90000| 34|10000|\n",
+            "|   Nina|     Legal|      NY| 93000| 38|16000|\n",
+            "|   Mona|     Legal|      CA| 87000| 45|12000|\n",
+            "|  David|Operations|      NY| 84000| 49|19000|\n",
+            "|  Kumar| marketing|      NY| 91000| 50|21000|\n",
+            "|    Jen|   finance|      NY| 79000| 53|15000|\n",
+            "|Micheal|     sales|      NY| 86000| 56|20000|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Name|Department|location|salary|Age|bonus|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|Micheal|     sales|      NY| 86000| 56|20000|\n",
+            "|    Jen|   finance|      NY| 79000| 53|15000|\n",
+            "|  Kumar| marketing|      NY| 91000| 50|21000|\n",
+            "|  David|Operations|      NY| 84000| 49|19000|\n",
+            "|   Mona|     Legal|      CA| 87000| 45|12000|\n",
+            "|   Nina|     Legal|      NY| 93000| 38|16000|\n",
+            "|  James|     sales|      NY| 90000| 34|10000|\n",
+            "|   John|Operations|      CA| 82000| 33|21000|\n",
+            "|   Saif|        IT|      CA| 72000| 31|22000|\n",
+            "| Robert|     sales|      CA| 81000| 30|23000|\n",
+            "|    Raj|        IT|      NY| 65000| 29|17000|\n",
+            "|   Alex|        HR|      CA| 78000| 28|11000|\n",
+            "|   Sara|        HR|      NY| 75000| 27|14000|\n",
+            "|   Jeff| marketing|      CA| 80000| 25|18000|\n",
+            "|  Maria|   finance|      CA| 90000| 24|23000|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Sorting with multiple columns\n",
+        "df.sort('Department', 'location').show()\n",
+        "df.sort(col(\"Department\"), col('location')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "67MlykbrIJMV",
+        "outputId": "8f27b537-7a6b-4084-9acc-282deefc70c0"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Name|Department|location|salary|Age|bonus|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Alex|        HR|      CA| 78000| 28|11000|\n",
+            "|   Sara|        HR|      NY| 75000| 27|14000|\n",
+            "|   Saif|        IT|      CA| 72000| 31|22000|\n",
+            "|    Raj|        IT|      NY| 65000| 29|17000|\n",
+            "|   Mona|     Legal|      CA| 87000| 45|12000|\n",
+            "|   Nina|     Legal|      NY| 93000| 38|16000|\n",
+            "|   John|Operations|      CA| 82000| 33|21000|\n",
+            "|  David|Operations|      NY| 84000| 49|19000|\n",
+            "|  Maria|   finance|      CA| 90000| 24|23000|\n",
+            "|    Jen|   finance|      NY| 79000| 53|15000|\n",
+            "|   Jeff| marketing|      CA| 80000| 25|18000|\n",
+            "|  Kumar| marketing|      NY| 91000| 50|21000|\n",
+            "| Robert|     sales|      CA| 81000| 30|23000|\n",
+            "|  James|     sales|      NY| 90000| 34|10000|\n",
+            "|Micheal|     sales|      NY| 86000| 56|20000|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Name|Department|location|salary|Age|bonus|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Alex|        HR|      CA| 78000| 28|11000|\n",
+            "|   Sara|        HR|      NY| 75000| 27|14000|\n",
+            "|   Saif|        IT|      CA| 72000| 31|22000|\n",
+            "|    Raj|        IT|      NY| 65000| 29|17000|\n",
+            "|   Mona|     Legal|      CA| 87000| 45|12000|\n",
+            "|   Nina|     Legal|      NY| 93000| 38|16000|\n",
+            "|   John|Operations|      CA| 82000| 33|21000|\n",
+            "|  David|Operations|      NY| 84000| 49|19000|\n",
+            "|  Maria|   finance|      CA| 90000| 24|23000|\n",
+            "|    Jen|   finance|      NY| 79000| 53|15000|\n",
+            "|   Jeff| marketing|      CA| 80000| 25|18000|\n",
+            "|  Kumar| marketing|      NY| 91000| 50|21000|\n",
+            "| Robert|     sales|      CA| 81000| 30|23000|\n",
+            "|  James|     sales|      NY| 90000| 34|10000|\n",
+            "|Micheal|     sales|      NY| 86000| 56|20000|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Sorting with orderby\n",
+        "df.orderBy('Age').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "rb3L_1HvISz2",
+        "outputId": "3553032a-e13c-4e36-9ebe-2a72a1777352"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Name|Department|location|salary|Age|bonus|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|  Maria|   finance|      CA| 90000| 24|23000|\n",
+            "|   Jeff| marketing|      CA| 80000| 25|18000|\n",
+            "|   Sara|        HR|      NY| 75000| 27|14000|\n",
+            "|   Alex|        HR|      CA| 78000| 28|11000|\n",
+            "|    Raj|        IT|      NY| 65000| 29|17000|\n",
+            "| Robert|     sales|      CA| 81000| 30|23000|\n",
+            "|   Saif|        IT|      CA| 72000| 31|22000|\n",
+            "|   John|Operations|      CA| 82000| 33|21000|\n",
+            "|  James|     sales|      NY| 90000| 34|10000|\n",
+            "|   Nina|     Legal|      NY| 93000| 38|16000|\n",
+            "|   Mona|     Legal|      CA| 87000| 45|12000|\n",
+            "|  David|Operations|      NY| 84000| 49|19000|\n",
+            "|  Kumar| marketing|      NY| 91000| 50|21000|\n",
+            "|    Jen|   finance|      NY| 79000| 53|15000|\n",
+            "|Micheal|     sales|      NY| 86000| 56|20000|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.orderBy(col('Age').desc()).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "YDsf0z_rIV58",
+        "outputId": "cb08f78f-123d-4a11-e4c3-53647ee3c1b1"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+----------+--------+------+---+-----+\n",
+            "|   Name|Department|location|salary|Age|bonus|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "|Micheal|     sales|      NY| 86000| 56|20000|\n",
+            "|    Jen|   finance|      NY| 79000| 53|15000|\n",
+            "|  Kumar| marketing|      NY| 91000| 50|21000|\n",
+            "|  David|Operations|      NY| 84000| 49|19000|\n",
+            "|   Mona|     Legal|      CA| 87000| 45|12000|\n",
+            "|   Nina|     Legal|      NY| 93000| 38|16000|\n",
+            "|  James|     sales|      NY| 90000| 34|10000|\n",
+            "|   John|Operations|      CA| 82000| 33|21000|\n",
+            "|   Saif|        IT|      CA| 72000| 31|22000|\n",
+            "| Robert|     sales|      CA| 81000| 30|23000|\n",
+            "|    Raj|        IT|      NY| 65000| 29|17000|\n",
+            "|   Alex|        HR|      CA| 78000| 28|11000|\n",
+            "|   Sara|        HR|      NY| 75000| 27|14000|\n",
+            "|   Jeff| marketing|      CA| 80000| 25|18000|\n",
+            "|  Maria|   finance|      CA| 90000| 24|23000|\n",
+            "+-------+----------+--------+------+---+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. pyspark program to demonstrate drop rows with NULL values"
+      ],
+      "metadata": {
+        "id": "C4U8W5qwIbWR"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col"
+      ],
+      "metadata": {
+        "id": "OH5iAQMAKhKE"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "yblRsT-VK6Vs"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "file_path = '/content/Book1.csv'\n",
+        "df = spark.read.options(header=True, inferSchema=True).csv(file_path)\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "cKc3NevlK-g7",
+        "outputId": "2233e5ac-cccc-472b-c43b-d1e341898f84"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-------+--------+------+-----+-----------+\n",
+            "| id|zipcode|    type|  city|state|population |\n",
+            "+---+-------+--------+------+-----+-----------+\n",
+            "|  1|    704|standard|  NULL|   PR|      30100|\n",
+            "|  2|    704|    NULL|Bhopal|   PR|       NULL|\n",
+            "|  3|    709|    NULL|Mumbai|   PR|       3700|\n",
+            "|  4|  76166|  unique|  Pune|   TX|      84000|\n",
+            "|  5|  76177|standard| Delhi|   TX|       NULL|\n",
+            "+---+-------+--------+------+-----+-----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Drop NA/NULL values\n",
+        "df.dropna().show()\n",
+        "df.na.drop(how='any').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "JOOnEV8wLPbH",
+        "outputId": "703cdb68-b64c-478a-8616-612ebc481b76"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-------+------+----+-----+-----------+\n",
+            "| id|zipcode|  type|city|state|population |\n",
+            "+---+-------+------+----+-----+-----------+\n",
+            "|  4|  76166|unique|Pune|   TX|      84000|\n",
+            "+---+-------+------+----+-----+-----------+\n",
+            "\n",
+            "+---+-------+------+----+-----+-----------+\n",
+            "| id|zipcode|  type|city|state|population |\n",
+            "+---+-------+------+----+-----+-----------+\n",
+            "|  4|  76166|unique|Pune|   TX|      84000|\n",
+            "+---+-------+------+----+-----+-----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Drop NA/NULL values\n",
+        "df.dropna(subset=['population ']).show()\n",
+        "df.na.drop(subset=['population ']).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "RngnDn4_LZey",
+        "outputId": "4161a570-f3fc-455d-8ec8-ba803f0f7780"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-------+--------+------+-----+-----------+\n",
+            "| id|zipcode|    type|  city|state|population |\n",
+            "+---+-------+--------+------+-----+-----------+\n",
+            "|  1|    704|standard|  NULL|   PR|      30100|\n",
+            "|  3|    709|    NULL|Mumbai|   PR|       3700|\n",
+            "|  4|  76166|  unique|  Pune|   TX|      84000|\n",
+            "+---+-------+--------+------+-----+-----------+\n",
+            "\n",
+            "+---+-------+--------+------+-----+-----------+\n",
+            "| id|zipcode|    type|  city|state|population |\n",
+            "+---+-------+--------+------+-----+-----------+\n",
+            "|  1|    704|standard|  NULL|   PR|      30100|\n",
+            "|  3|    709|    NULL|Mumbai|   PR|       3700|\n",
+            "|  4|  76166|  unique|  Pune|   TX|      84000|\n",
+            "+---+-------+--------+------+-----+-----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. program to demonstrate Pyspark split() columns with Options"
+      ],
+      "metadata": {
+        "id": "zXOVchxlLkcf"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import split, col"
+      ],
+      "metadata": {
+        "id": "uXRgq6udQFLJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "dkGayzwvQ1us"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    ('James,Simth', '1991-04-01'),\n",
+        "    ('Michael,Rose', '2000-05-19'),\n",
+        "    ('Robert,Williams', '1978-09-12'),\n",
+        "    ('Maria,Jones', '1994-03-25'),\n",
+        "    ('Jen,Brown', '1988-07-17'),\n",
+        "    ('Jeff,Davis', '1992-06-04'),\n",
+        "    ('Kumar,Patel', '1985-10-30'),\n",
+        "    ('Saif,Khan', '1997-11-11'),\n",
+        "    ('Raj,Singh', '1990-02-02'),\n",
+        "    ('Alex,Johnson', '1983-08-20')\n",
+        "]\n"
+      ],
+      "metadata": {
+        "id": "iCDmZQqpQ4yX"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['Name', 'dob']\n",
+        "\n",
+        "df = spark.createDataFrame(data=data, schema=columns)"
+      ],
+      "metadata": {
+        "id": "tSvO_xpgRGD8"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "rwpOC0xbROxa",
+        "outputId": "12f3ab52-7545-4494-9e86-4a3c45467a26"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------------+----------+\n",
+            "|           Name|       dob|\n",
+            "+---------------+----------+\n",
+            "|    James,Simth|1991-04-01|\n",
+            "|   Michael,Rose|2000-05-19|\n",
+            "|Robert,Williams|1978-09-12|\n",
+            "|    Maria,Jones|1994-03-25|\n",
+            "|      Jen,Brown|1988-07-17|\n",
+            "|     Jeff,Davis|1992-06-04|\n",
+            "|    Kumar,Patel|1985-10-30|\n",
+            "|      Saif,Khan|1997-11-11|\n",
+            "|      Raj,Singh|1990-02-02|\n",
+            "|   Alex,Johnson|1983-08-20|\n",
+            "+---------------+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_split = df.withColumn(\"New_name\", split(col('Name'), \",\"))\n",
+        "df_split.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "0EnnXIg5RPS5",
+        "outputId": "5ca6544e-19b1-46fb-eafe-b3425b03c72a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------------+----------+------------------+\n",
+            "|           Name|       dob|          New_name|\n",
+            "+---------------+----------+------------------+\n",
+            "|    James,Simth|1991-04-01|    [James, Simth]|\n",
+            "|   Michael,Rose|2000-05-19|   [Michael, Rose]|\n",
+            "|Robert,Williams|1978-09-12|[Robert, Williams]|\n",
+            "|    Maria,Jones|1994-03-25|    [Maria, Jones]|\n",
+            "|      Jen,Brown|1988-07-17|      [Jen, Brown]|\n",
+            "|     Jeff,Davis|1992-06-04|     [Jeff, Davis]|\n",
+            "|    Kumar,Patel|1985-10-30|    [Kumar, Patel]|\n",
+            "|      Saif,Khan|1997-11-11|      [Saif, Khan]|\n",
+            "|      Raj,Singh|1990-02-02|      [Raj, Singh]|\n",
+            "|   Alex,Johnson|1983-08-20|   [Alex, Johnson]|\n",
+            "+---------------+----------+------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2 = df_split.withColumn('firstname', df_split['New_name'].getItem(0))\\\n",
+        "  .withColumn('lastname', df_split['New_name'].getItem(1)).select('firstname', 'lastname', 'dob')\n",
+        "\n",
+        "df2.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2nG0GVvJRXzD",
+        "outputId": "8d38710c-7403-4259-9ee1-2bce9a31310d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+----------+\n",
+            "|firstname|lastname|       dob|\n",
+            "+---------+--------+----------+\n",
+            "|    James|   Simth|1991-04-01|\n",
+            "|  Michael|    Rose|2000-05-19|\n",
+            "|   Robert|Williams|1978-09-12|\n",
+            "|    Maria|   Jones|1994-03-25|\n",
+            "|      Jen|   Brown|1988-07-17|\n",
+            "|     Jeff|   Davis|1992-06-04|\n",
+            "|    Kumar|   Patel|1985-10-30|\n",
+            "|     Saif|    Khan|1997-11-11|\n",
+            "|      Raj|   Singh|1990-02-02|\n",
+            "|     Alex| Johnson|1983-08-20|\n",
+            "+---------+--------+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2_split = df2.withColumn('New_dob', split(col('dob'), '-'))\n",
+        "df2_split.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "w2GNlpjkRxmG",
+        "outputId": "5adce7ba-cf05-477b-b75c-e5b3db4f3453"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+----------+--------------+\n",
+            "|firstname|lastname|       dob|       New_dob|\n",
+            "+---------+--------+----------+--------------+\n",
+            "|    James|   Simth|1991-04-01|[1991, 04, 01]|\n",
+            "|  Michael|    Rose|2000-05-19|[2000, 05, 19]|\n",
+            "|   Robert|Williams|1978-09-12|[1978, 09, 12]|\n",
+            "|    Maria|   Jones|1994-03-25|[1994, 03, 25]|\n",
+            "|      Jen|   Brown|1988-07-17|[1988, 07, 17]|\n",
+            "|     Jeff|   Davis|1992-06-04|[1992, 06, 04]|\n",
+            "|    Kumar|   Patel|1985-10-30|[1985, 10, 30]|\n",
+            "|     Saif|    Khan|1997-11-11|[1997, 11, 11]|\n",
+            "|      Raj|   Singh|1990-02-02|[1990, 02, 02]|\n",
+            "|     Alex| Johnson|1983-08-20|[1983, 08, 20]|\n",
+            "+---------+--------+----------+--------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df3 = df2_split.select('firstname', 'lastname', col('New_dob').getItem(0).alias('year'),\\\n",
+        "                       col('New_dob').getItem(1).alias('month'),\n",
+        "                       col('New_dob').getItem(2).alias('date'))\n",
+        "df3.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Oz3ZVcNsR9KC",
+        "outputId": "5385811a-28c1-445d-8048-91aa09f62b82"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+----+-----+----+\n",
+            "|firstname|lastname|year|month|date|\n",
+            "+---------+--------+----+-----+----+\n",
+            "|    James|   Simth|1991|   04|  01|\n",
+            "|  Michael|    Rose|2000|   05|  19|\n",
+            "|   Robert|Williams|1978|   09|  12|\n",
+            "|    Maria|   Jones|1994|   03|  25|\n",
+            "|      Jen|   Brown|1988|   07|  17|\n",
+            "|     Jeff|   Davis|1992|   06|  04|\n",
+            "|    Kumar|   Patel|1985|   10|  30|\n",
+            "|     Saif|    Khan|1997|   11|  11|\n",
+            "|      Raj|   Singh|1990|   02|  02|\n",
+            "|     Alex| Johnson|1983|   08|  20|\n",
+            "+---------+--------+----+-----+----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### D. program to demonstrate pyspark concatenation columns with Options"
+      ],
+      "metadata": {
+        "id": "U1OA4NiwSoCU"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import concat, concat_ws, col, lit"
+      ],
+      "metadata": {
+        "id": "WpegumgZTZXj"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "DYNHmwhvTjyr"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"James\", \"Smith\", \"NY\"),\n",
+        "    (\"Anna\", \"Brown\", \"CA\"),\n",
+        "    (\"Robert\", \"Williams\", \"TX\"),\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "yXWdXObJToIN"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['firstname', 'lastname', 'state']\n",
+        "\n",
+        "df = spark.createDataFrame(data=data, schema=columns)\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "M22Op4B0TrLh",
+        "outputId": "a6a73a11-2365-4da0-c13b-0c4a1ce4be1a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+-----+\n",
+            "|firstname|lastname|state|\n",
+            "+---------+--------+-----+\n",
+            "|    James|   Smith|   NY|\n",
+            "|     Anna|   Brown|   CA|\n",
+            "|   Robert|Williams|   TX|\n",
+            "+---------+--------+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# concat\n",
+        "df_concat = df.withColumn('Name', concat(col('firstname'), col('lastname')))\n",
+        "df_concat.select(col('Name'), col('state')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "vEsUraKxTzMj",
+        "outputId": "7f2f8b0f-0454-462b-968c-ba4bf2ce6b45"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+--------------+-----+\n",
+            "|          Name|state|\n",
+            "+--------------+-----+\n",
+            "|    JamesSmith|   NY|\n",
+            "|     AnnaBrown|   CA|\n",
+            "|RobertWilliams|   TX|\n",
+            "+--------------+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# concat_ws\n",
+        "df_concat_ws = df.withColumn('Name', concat_ws(\"-\", col('firstname'), col('lastname')))\n",
+        "df_concat_ws.select('Name', 'state').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "k6fEDApWU7E5",
+        "outputId": "b111eea0-5731-4a81-cf16-b279b4f1f30f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------------+-----+\n",
+            "|           Name|state|\n",
+            "+---------------+-----+\n",
+            "|    James-Smith|   NY|\n",
+            "|     Anna-Brown|   CA|\n",
+            "|Robert-Williams|   TX|\n",
+            "+---------------+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### E. program to demonstrate pyspark fillna, fill and replace NULL values"
+      ],
+      "metadata": {
+        "id": "5EoPEmZ_VFWc"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col, avg"
+      ],
+      "metadata": {
+        "id": "3jhZ8wPQVea7"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "ASCruSpzVnPO"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"Alice\", 25, None),\n",
+        "    (\"Bob\", None, \"California\"),\n",
+        "    (\"Charlie\", 30, \"Texas\"),\n",
+        "    (None, 22, \"Nevada\"),\n",
+        "    (\"David\", None, None)\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "rQIogWBUVqGA"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['Name', 'Age', 'location']\n",
+        "df = spark.createDataFrame(data=data, schema=columns)\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "4j1wyCAXVt1K",
+        "outputId": "2148e592-00c1-48b0-de12-01a8ecf93212"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+----+----------+\n",
+            "|   Name| Age|  location|\n",
+            "+-------+----+----------+\n",
+            "|  Alice|  25|      NULL|\n",
+            "|    Bob|NULL|California|\n",
+            "|Charlie|  30|     Texas|\n",
+            "|   NULL|  22|    Nevada|\n",
+            "|  David|NULL|      NULL|\n",
+            "+-------+----+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# fillna\n",
+        "df.fillna({'Age':0, 'Name':'unknown', 'location':'unknown'}).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "HpAFeyNGV2dA",
+        "outputId": "004b147e-e818-4a9a-b2f0-1bc928019c3e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+---+----------+\n",
+            "|   Name|Age|  location|\n",
+            "+-------+---+----------+\n",
+            "|  Alice| 25|   unknown|\n",
+            "|    Bob|  0|California|\n",
+            "|Charlie| 30|     Texas|\n",
+            "|unknown| 22|    Nevada|\n",
+            "|  David|  0|   unknown|\n",
+            "+-------+---+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# fill\n",
+        "df.na.fill({'Age':0, 'location':'unknown', 'Name':'unknown'}).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "78oz7deqWNl4",
+        "outputId": "5798121d-deef-4df1-bda1-e18707bc8eab"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+---+----------+\n",
+            "|   Name|Age|  location|\n",
+            "+-------+---+----------+\n",
+            "|  Alice| 25|   unknown|\n",
+            "|    Bob|  0|California|\n",
+            "|Charlie| 30|     Texas|\n",
+            "|unknown| 22|    Nevada|\n",
+            "|  David|  0|   unknown|\n",
+            "+-------+---+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# replace\n",
+        "df.replace({30:35}).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "visc7USdWbU3",
+        "outputId": "dd8733e2-2e88-4880-fa77-418f1a85e1ad"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+----+----------+\n",
+            "|   Name| Age|  location|\n",
+            "+-------+----+----------+\n",
+            "|  Alice|  25|      NULL|\n",
+            "|    Bob|NULL|California|\n",
+            "|Charlie|  35|     Texas|\n",
+            "|   NULL|  22|    Nevada|\n",
+            "|  David|NULL|      NULL|\n",
+            "+-------+----+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 3"
+      ],
+      "metadata": {
+        "id": "FfWWiFu4ZQfq"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. pyspark program to demonstrate various Array Type Operations"
+      ],
+      "metadata": {
+        "id": "4ubM-dadaQ8j"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import array_contains, explode, size"
+      ],
+      "metadata": {
+        "id": "6l3kw6AfcjlB"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "THM-dFDoc9v-"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (1, [\"apple\", \"banana\", \"cherry\"]),\n",
+        "    (2, [\"banana\", \"orange\"]),\n",
+        "    (3, [\"apple\"]),\n",
+        "    (4, [])\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "-SHs5BUkdBYv"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['id', 'fruits']\n",
+        "\n",
+        "df = spark.createDataFrame(data=data, schema=columns)\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xDw63ugLdFQo",
+        "outputId": "cc744238-8435-483a-9519-1debc6b5377a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+--------------------+\n",
+            "| id|              fruits|\n",
+            "+---+--------------------+\n",
+            "|  1|[apple, banana, c...|\n",
+            "|  2|    [banana, orange]|\n",
+            "|  3|             [apple]|\n",
+            "|  4|                  []|\n",
+            "+---+--------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# explode\n",
+        "df.select('id', explode('fruits').alias('fruit')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "JqMGNbWFdM09",
+        "outputId": "bdb915ff-24e3-4b1e-bcc8-3e63b1cbcd1a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+------+\n",
+            "| id| fruit|\n",
+            "+---+------+\n",
+            "|  1| apple|\n",
+            "|  1|banana|\n",
+            "|  1|cherry|\n",
+            "|  2|banana|\n",
+            "|  2|orange|\n",
+            "|  3| apple|\n",
+            "+---+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# size\n",
+        "df.select('id', size('fruits').alias('num_fruits')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "UPl5sn3BdYHi",
+        "outputId": "781722cb-6ab2-4454-8e5c-ed066707e1c5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+\n",
+            "| id|num_fruits|\n",
+            "+---+----------+\n",
+            "|  1|         3|\n",
+            "|  2|         2|\n",
+            "|  3|         1|\n",
+            "|  4|         0|\n",
+            "+---+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# array_contains\n",
+        "df.select(\"id\", array_contains('fruits', 'banana').alias('is_available')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9BQ8bEQ7df-H",
+        "outputId": "38e64b01-1876-4402-d672-86f9146839be"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+------------+\n",
+            "| id|is_available|\n",
+            "+---+------------+\n",
+            "|  1|        true|\n",
+            "|  2|        true|\n",
+            "|  3|       false|\n",
+            "|  4|       false|\n",
+            "+---+------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. program to demonstrate pyspark convert array columns to a string with options"
+      ],
+      "metadata": {
+        "id": "H6X9anJcdrDh"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col, concat_ws"
+      ],
+      "metadata": {
+        "id": "-5bAwcfZeZQ_"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "-oSc4htDegrN"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (1, [\"apple\", \"banana\", \"cherry\"]),\n",
+        "    (2, [\"banana\", \"orange\"]),\n",
+        "    (3, [\"apple\"]),\n",
+        "    (4, [])\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "awfjC4GrekHT"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['id', 'fruits']"
+      ],
+      "metadata": {
+        "id": "qJ1O-XHye4dP"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data=data, schema=columns)\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "p3DbVAdhe6pX",
+        "outputId": "a872aafe-2fcc-4530-f6bd-e967437ff326"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+--------------------+\n",
+            "| id|              fruits|\n",
+            "+---+--------------------+\n",
+            "|  1|[apple, banana, c...|\n",
+            "|  2|    [banana, orange]|\n",
+            "|  3|             [apple]|\n",
+            "|  4|                  []|\n",
+            "+---+--------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.withColumn('fruit', concat_ws('-', col('fruits'))).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "JkA2_rSle-ru",
+        "outputId": "8cbe8a59-e4e7-4f89-8b21-2bc6edcaad5a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+--------------------+-------------------+\n",
+            "| id|              fruits|              fruit|\n",
+            "+---+--------------------+-------------------+\n",
+            "|  1|[apple, banana, c...|apple-banana-cherry|\n",
+            "|  2|    [banana, orange]|      banana-orange|\n",
+            "|  3|             [apple]|              apple|\n",
+            "|  4|                  []|                   |\n",
+            "+---+--------------------+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.withColumn('fruit', concat_ws(':', col('fruits'))).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "utF25ku8fJaZ",
+        "outputId": "65147599-2d01-4f43-8892-c778a4dac4d1"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+--------------------+-------------------+\n",
+            "| id|              fruits|              fruit|\n",
+            "+---+--------------------+-------------------+\n",
+            "|  1|[apple, banana, c...|apple:banana:cherry|\n",
+            "|  2|    [banana, orange]|      banana:orange|\n",
+            "|  3|             [apple]|              apple|\n",
+            "|  4|                  []|                   |\n",
+            "+---+--------------------+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.createTempView('ArrayStrings2')\n",
+        "spark.sql(\"SELECT id, concat_ws('--', fruits) FROM ArrayStrings2\").show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3DLXmSBBfPMV",
+        "outputId": "03cd35fc-902c-4d0a-9324-585f860060c1"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+---------------------+\n",
+            "| id|concat_ws(--, fruits)|\n",
+            "+---+---------------------+\n",
+            "|  1| apple--banana--ch...|\n",
+            "|  2|       banana--orange|\n",
+            "|  3|                apple|\n",
+            "|  4|                     |\n",
+            "+---+---------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. pyspark program to demonstrate converting a string column to an array column"
+      ],
+      "metadata": {
+        "id": "fOkf0NxLfmyC"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import split, col"
+      ],
+      "metadata": {
+        "id": "fqwJpwA2gC7z"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "hcastTx4gK3r"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (1, \"apple,banana,cherry\"),\n",
+        "    (2, \"banana,orange\"),\n",
+        "    (3, \"apple\"),\n",
+        "    (4, \"\")\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "Rq2sA25YgO72"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "columns = ['id', 'fruits']"
+      ],
+      "metadata": {
+        "id": "sjnpibGqgmdr"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data=data, schema=columns)\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "QcifIwpfgoFW",
+        "outputId": "93728f82-9039-45bf-de85-5a1b5a2c7157"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-------------------+\n",
+            "| id|             fruits|\n",
+            "+---+-------------------+\n",
+            "|  1|apple,banana,cherry|\n",
+            "|  2|      banana,orange|\n",
+            "|  3|              apple|\n",
+            "|  4|                   |\n",
+            "+---+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# split()\n",
+        "df.withColumn('fruit', split(col('fruits'), \",\")).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Qih6iw8igsWx",
+        "outputId": "d3e1f662-be98-40a2-9fe4-de71aec27688"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-------------------+--------------------+\n",
+            "| id|             fruits|               fruit|\n",
+            "+---+-------------------+--------------------+\n",
+            "|  1|apple,banana,cherry|[apple, banana, c...|\n",
+            "|  2|      banana,orange|    [banana, orange]|\n",
+            "|  3|              apple|             [apple]|\n",
+            "|  4|                   |                  []|\n",
+            "+---+-------------------+--------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.createTempView(\"SplitArray\")\n",
+        "spark.sql('SELECT id, split(fruits, \",\") from SplitArray').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Mc6VpGMzg0eV",
+        "outputId": "b411902a-7d2b-4dd0-8aab-65aa371a4c15"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+--------------------+\n",
+            "| id|split(fruits, ,, -1)|\n",
+            "+---+--------------------+\n",
+            "|  1|[apple, banana, c...|\n",
+            "|  2|    [banana, orange]|\n",
+            "|  3|             [apple]|\n",
+            "|  4|                  []|\n",
+            "+---+--------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### D. pyspark program to demonstrate converting Map to column"
+      ],
+      "metadata": {
+        "id": "AdBer4GYhE9t"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col"
+      ],
+      "metadata": {
+        "id": "l5QcgfrsjGIu"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('exmas').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "ssBEOMWD1gzB"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (1, {\"key1\": \"value1\", \"key2\": \"value2\"}),\n",
+        "    (2, {\"key1\": \"value3\", \"key2\": \"value4\"}),\n",
+        "    (3, {\"key1\": \"value5\", \"key3\": \"value6\"})\n",
+        "]\n",
+        "\n",
+        "columns = [\"id\", \"properties\"]"
+      ],
+      "metadata": {
+        "id": "JbDxqCOa1mg9"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data = data, schema = columns)\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9SE-ouE_2iBg",
+        "outputId": "6f31ec84-cbd2-4d8c-b7f5-db4ff550f996"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+--------------------+\n",
+            "| id|          properties|\n",
+            "+---+--------------------+\n",
+            "|  1|{key1 -> value1, ...|\n",
+            "|  2|{key1 -> value3, ...|\n",
+            "|  3|{key1 -> value5, ...|\n",
+            "+---+--------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# convert to DF\n",
+        "df.select('id', col('properties')['key1'].alias('key1Value'),\n",
+        "          col('properties')['key2'].alias('key2Value'),\n",
+        "          col('properties')['key3'].alias('key3Value')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "dwdDFk4E203v",
+        "outputId": "51504ef0-f874-4a89-c4e9-d26495346d90"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+---------+---------+---------+\n",
+            "| id|key1Value|key2Value|key3Value|\n",
+            "+---+---------+---------+---------+\n",
+            "|  1|   value1|   value2|     NULL|\n",
+            "|  2|   value3|   value4|     NULL|\n",
+            "|  3|   value5|     NULL|   value6|\n",
+            "+---+---------+---------+---------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Using rdd map\n",
+        "\n",
+        "df2 = df.rdd.map(lambda x: (x.id, x.properties.get('key1', None), x.properties.get('key2', None), x.properties.get('key3', None))).toDF(['id', 'key1Value', 'key2Value', 'key3Value'])"
+      ],
+      "metadata": {
+        "id": "C8OdmDZG3C17"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "q2g9ca6E3UEW",
+        "outputId": "39075799-2d5d-4e0f-f109-9940edd213f7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+---------+---------+---------+\n",
+            "| id|key1Value|key2Value|key3Value|\n",
+            "+---+---------+---------+---------+\n",
+            "|  1|   value1|   value2|     NULL|\n",
+            "|  2|   value3|   value4|     NULL|\n",
+            "|  3|   value5|     NULL|   value6|\n",
+            "+---+---------+---------+---------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### programme to demonstrate use of explode an array & map"
+      ],
+      "metadata": {
+        "id": "HFCd3yfx3fUc"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import explode"
+      ],
+      "metadata": {
+        "id": "gSBTl1hc3pud"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "NWl2UbIW37HE"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (1, ['banana', 'mango', 'cherry'], {'a':1, 'b':2}),\n",
+        "    (2, ['organe', 'mango', 'cherry'], {'c':3, 'd':4})\n",
+        "]\n",
+        "\n",
+        "columns = ['id', 'fruits', 'keys']"
+      ],
+      "metadata": {
+        "id": "GIC85zm54inR"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data=data, schema=columns)"
+      ],
+      "metadata": {
+        "id": "YF1faW0f44ZY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZyozmIgx48BZ",
+        "outputId": "69418ee5-228a-40a7-fd0b-1dbb9fdcdd99"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+--------------------+----------------+\n",
+            "| id|              fruits|            keys|\n",
+            "+---+--------------------+----------------+\n",
+            "|  1|[banana, mango, c...|{a -> 1, b -> 2}|\n",
+            "|  2|[organe, mango, c...|{d -> 4, c -> 3}|\n",
+            "+---+--------------------+----------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# explode array\n",
+        "df.select('id', explode(df.fruits).alias('fruit')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "mxWo-Oyh48mD",
+        "outputId": "5aeb033b-847d-44a1-aa49-d77f0a5fd063"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+------+\n",
+            "| id| fruit|\n",
+            "+---+------+\n",
+            "|  1|banana|\n",
+            "|  1| mango|\n",
+            "|  1|cherry|\n",
+            "|  2|organe|\n",
+            "|  2| mango|\n",
+            "|  2|cherry|\n",
+            "+---+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select('id', explode(df.keys).alias('key', 'value')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Z0yenx9N5EWI",
+        "outputId": "115810e7-ca5b-4a50-ab48-93089287aa7f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+---+-----+\n",
+            "| id|key|value|\n",
+            "+---+---+-----+\n",
+            "|  1|  a|    1|\n",
+            "|  1|  b|    2|\n",
+            "|  2|  d|    4|\n",
+            "|  2|  c|    3|\n",
+            "+---+---+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### program to demonstrate use of explode on nested array"
+      ],
+      "metadata": {
+        "id": "0mF-HjYl5LlL"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import explode"
+      ],
+      "metadata": {
+        "id": "7XYmTRdV5XXP"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "pfSKuVxQ5lTC"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (1, [[1,2,3], [4,5]]),\n",
+        "    (2, [[2,3,4], [3,6]])\n",
+        "]\n",
+        "\n",
+        "columns = ['id', 'array']"
+      ],
+      "metadata": {
+        "id": "_Rbt927y5pgo"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data=data, schema=columns)"
+      ],
+      "metadata": {
+        "id": "mCZoYhk75xcC"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "smOpOByn507A",
+        "outputId": "f1cff94f-d8d7-4e3d-ee6d-6fcc9d8553cc"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-------------------+\n",
+            "| id|              array|\n",
+            "+---+-------------------+\n",
+            "|  1|[[1, 2, 3], [4, 5]]|\n",
+            "|  2|[[2, 3, 4], [3, 6]]|\n",
+            "+---+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# exploding outer array\n",
+        "df2 = df.select('id', explode(df.array).alias('outerarray'))\n",
+        "df2.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "_80AtR9c51fm",
+        "outputId": "deb39dd0-b7da-46ed-9504-ad084e488afd"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+\n",
+            "| id|outerarray|\n",
+            "+---+----------+\n",
+            "|  1| [1, 2, 3]|\n",
+            "|  1|    [4, 5]|\n",
+            "|  2| [2, 3, 4]|\n",
+            "|  2|    [3, 6]|\n",
+            "+---+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# exploding inner arry\n",
+        "df2.select('id', explode(df2.outerarray).alias('innerarray')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "XkIe57Ta6ELN",
+        "outputId": "bde6843c-9feb-441c-b04e-cac1e9bf85f5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+\n",
+            "| id|innerarray|\n",
+            "+---+----------+\n",
+            "|  1|         1|\n",
+            "|  1|         2|\n",
+            "|  1|         3|\n",
+            "|  1|         4|\n",
+            "|  1|         5|\n",
+            "|  2|         2|\n",
+            "|  2|         3|\n",
+            "|  2|         4|\n",
+            "|  2|         3|\n",
+            "|  2|         6|\n",
+            "+---+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 4"
+      ],
+      "metadata": {
+        "id": "6Ufhpdgp6RJu"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. Write a programme to demonstrate PySpark Aggregate with options."
+      ],
+      "metadata": {
+        "id": "Ql51CMyDQk_C"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "tcpVSJHlQk7x"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "3ICmcDDTQk32"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"A\", \"north\", \"2024-01\", 100.0, 2),\n",
+        "    (\"A\", \"north\", \"2024-02\", 150.0, 3),\n",
+        "    (\"A\", \"south\", \"2024-01\", 200.0, 4),\n",
+        "    (\"B\", \"north\", \"2024-01\", 120.0, 1),\n",
+        "    (\"B\", \"south\", \"2024-02\", 180.0, 2),\n",
+        "    (\"B\", \"south\", \"2024-03\", 220.0, 5),\n",
+        "]\n",
+        "\n",
+        "cols = [\"product\",\"region\",\"month\",\"revenue\",\"qty\"]\n",
+        "\n",
+        "df = spark.createDataFrame(data, cols)"
+      ],
+      "metadata": {
+        "id": "VfG_6DEhRAub"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.agg(F.sum(df.revenue),\n",
+        "       F.avg(df.revenue),\n",
+        "       F.median(df.revenue)).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wel_bxPiRAa3",
+        "outputId": "9e697a5f-1d98-4866-ed92-8241be5c5689"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------------+------------------+---------------+\n",
+            "|sum(revenue)|      avg(revenue)|median(revenue)|\n",
+            "+------------+------------------+---------------+\n",
+            "|       970.0|161.66666666666666|          165.0|\n",
+            "+------------+------------------+---------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.groupby('region').agg(F.sum(df.revenue)).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "MUmhl78ERAXF",
+        "outputId": "37928f6a-db96-4470-a66c-23c171f94164"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------+------------+\n",
+            "|region|sum(revenue)|\n",
+            "+------+------------+\n",
+            "| north|       370.0|\n",
+            "| south|       600.0|\n",
+            "+------+------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. Write a programme to demonstrate pyspark GroupBy with options"
+      ],
+      "metadata": {
+        "id": "0cXsIIsWR_vo"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pyspark\n",
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "R5IfQDSWSPHE"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "CNGT1h3mSPHF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"A\", \"north\", \"2024-01\", 100.0, 2),\n",
+        "    (\"A\", \"north\", \"2024-02\", 150.0, 3),\n",
+        "    (\"A\", \"south\", \"2024-01\", 200.0, 4),\n",
+        "    (\"B\", \"north\", \"2024-01\", 120.0, 1),\n",
+        "    (\"B\", \"south\", \"2024-02\", 180.0, 2),\n",
+        "    (\"B\", \"south\", \"2024-03\", 220.0, 5),\n",
+        "]\n",
+        "\n",
+        "cols = [\"product\",\"region\",\"month\",\"revenue\",\"qty\"]\n",
+        "\n",
+        "df = spark.createDataFrame(data, cols)"
+      ],
+      "metadata": {
+        "id": "DN0uscqYSPHF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.groupby('product').sum('revenue').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "eNf4WX4yR_dI",
+        "outputId": "51fb8360-23b8-4168-e163-351d3b927292"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+------------+\n",
+            "|product|sum(revenue)|\n",
+            "+-------+------------+\n",
+            "|      A|       450.0|\n",
+            "|      B|       520.0|\n",
+            "+-------+------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.groupby('region').agg(F.sum(df.revenue), F.count(df.revenue).alias('Total Products'), F.mean(df.revenue)).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Web8OsiXR_aF",
+        "outputId": "3fb23d81-6fb7-485c-cb6b-0c6cf521a0cd"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------+------------+--------------+------------------+\n",
+            "|region|sum(revenue)|Total Products|      avg(revenue)|\n",
+            "+------+------------+--------------+------------------+\n",
+            "| north|       370.0|             3|123.33333333333333|\n",
+            "| south|       600.0|             3|             200.0|\n",
+            "+------+------------+--------------+------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. Write a program to demonstrate Code of Pyspark Count Distinct with options"
+      ],
+      "metadata": {
+        "id": "k9vBzmb3THZU"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "sRQvycapTQT3"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "_aiM8sljTQQA"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"A\", \"x\", 1), (\"A\", \"x\", 1),\n",
+        "    (\"A\", \"y\", 2), (\"A\", None, 3),\n",
+        "    (\"B\", \"y\", 2), (\"B\", \"z\", 3),\n",
+        "    (\"B\", \"z\", 3), (\"B\", None, None),\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "fErc0OAHTQMS"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data, schema = ['group', 'cat', 'val'])\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "id": "kCgGvLqSTQHc",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "0f44ba83-ba31-4ca8-ecc5-1a779ccdb67e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-----+----+----+\n",
+            "|group| cat| val|\n",
+            "+-----+----+----+\n",
+            "|    A|   x|   1|\n",
+            "|    A|   x|   1|\n",
+            "|    A|   y|   2|\n",
+            "|    A|NULL|   3|\n",
+            "|    B|   y|   2|\n",
+            "|    B|   z|   3|\n",
+            "|    B|   z|   3|\n",
+            "|    B|NULL|NULL|\n",
+            "+-----+----+----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.agg(F.count_distinct(\"cat\").alias(\n",
+        "    'distinct_cat'\n",
+        ")).show()"
+      ],
+      "metadata": {
+        "id": "YmdmdXYmTQAE",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "84cda253-bed8-44b4-cd5f-44f386d31dac"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------------+\n",
+            "|distinct_cat|\n",
+            "+------------+\n",
+            "|           3|\n",
+            "+------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.agg(F.count_distinct('val').alias(\"Distinct Val\")).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZCqE6ctvChVu",
+        "outputId": "b2d7179c-9545-434f-bc29-bb8dff57e06a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------------+\n",
+            "|Distinct Val|\n",
+            "+------------+\n",
+            "|           3|\n",
+            "+------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### D.Write a program to demonstrate select first row of each group with options"
+      ],
+      "metadata": {
+        "id": "R7Xz9y6hChSM"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F\n",
+        "from pyspark.sql.window import Window"
+      ],
+      "metadata": {
+        "id": "ktHLOVN8ChOd"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "5khSn06EChKU"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"A\", \"p1\", 10, \"2025-09-01\"),\n",
+        "    (\"A\", \"p2\", 15, \"2025-09-02\"),\n",
+        "    (\"A\", \"p2\", 15, \"2025-09-03\"),\n",
+        "    (\"B\", \"p3\",  5, \"2025-09-01\"),\n",
+        "    (\"B\", \"p4\",  9, \"2025-09-02\"),\n",
+        "    (\"B\", \"p4\",  9, \"2025-09-05\"),\n",
+        "    (\"C\", None,  7, \"2025-09-01\"),\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "3t95xv0UChGw"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data, schema = ['group', 'item', 'score', 'ts'])"
+      ],
+      "metadata": {
+        "id": "xsvP-w9kChDR"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show(truncate=False)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "a90AyW4vCg_W",
+        "outputId": "ee12b0d8-6217-4b3f-f931-e6b5fed48f84"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-----+----+-----+----------+\n",
+            "|group|item|score|ts        |\n",
+            "+-----+----+-----+----------+\n",
+            "|A    |p1  |10   |2025-09-01|\n",
+            "|A    |p2  |15   |2025-09-02|\n",
+            "|A    |p2  |15   |2025-09-03|\n",
+            "|B    |p3  |5    |2025-09-01|\n",
+            "|B    |p4  |9    |2025-09-02|\n",
+            "|B    |p4  |9    |2025-09-05|\n",
+            "|C    |NULL|7    |2025-09-01|\n",
+            "+-----+----+-----+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "w = Window.partitionBy(\"group\").orderBy(\"score\")"
+      ],
+      "metadata": {
+        "id": "WeMSTRfjCgn8"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "first_per_group = (\n",
+        "    df.withColumn(\"rn\", F.row_number().over(w)).filter(F.col(\"rn\") == 1).drop(\"rn\"))\n",
+        "\n",
+        "\n",
+        "first_per_group.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jkP3yIpFCgkd",
+        "outputId": "6329ecfe-b900-47d7-a47b-f4903a3a0250"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-----+----+-----+----------+\n",
+            "|group|item|score|        ts|\n",
+            "+-----+----+-----+----------+\n",
+            "|    A|  p1|   10|2025-09-01|\n",
+            "|    B|  p3|    5|2025-09-01|\n",
+            "|    C|NULL|    7|2025-09-01|\n",
+            "+-----+----+-----+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 5"
+      ],
+      "metadata": {
+        "id": "D1m8IbDjCgg-"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. Write a programme to demonstrate use of Pyspark date and timestamp function"
+      ],
+      "metadata": {
+        "id": "B7lxohNICgd_"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "O95d0VLOCgaY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"exams\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "W38ZBBgZCgW7"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "src = [\n",
+        "    (\"1\", \"2025-09-15\", \"2025-09-15 08:45:30\"),\n",
+        "    (\"2\", \"2024-02-29\", \"2024-02-29 23:59:59\"),\n",
+        "    (\"3\", \"2023-12-31\", \"2023-12-31 00:00:00\"),\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "OYMEQQ2iCgUF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(src, ['id', 'date_str', 'ts_str'])"
+      ],
+      "metadata": {
+        "id": "qj2QHby2CgRA"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "RpWaq_yDCgMl",
+        "outputId": "632cbe3a-a0be-4cb9-e994-06da788a34cc"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+-------------------+\n",
+            "| id|  date_str|             ts_str|\n",
+            "+---+----------+-------------------+\n",
+            "|  1|2025-09-15|2025-09-15 08:45:30|\n",
+            "|  2|2024-02-29|2024-02-29 23:59:59|\n",
+            "|  3|2023-12-31|2023-12-31 00:00:00|\n",
+            "+---+----------+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "current_timestamp_df = df.withColumn(\"Current_date\", F.current_date())\\\n",
+        "                        .withColumn(\"Current_timestamp\", F.current_timestamp())"
+      ],
+      "metadata": {
+        "id": "GZ5Qyfx3CgCN"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "current_timestamp_df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "zTMqMnBcCf__",
+        "outputId": "f9a45ed6-5ca7-4912-cbe7-e103236f813d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+-------------------+------------+--------------------+\n",
+            "| id|  date_str|             ts_str|Current_date|   Current_timestamp|\n",
+            "+---+----------+-------------------+------------+--------------------+\n",
+            "|  1|2025-09-15|2025-09-15 08:45:30|  2025-09-25|2025-09-25 04:32:...|\n",
+            "|  2|2024-02-29|2024-02-29 23:59:59|  2025-09-25|2025-09-25 04:32:...|\n",
+            "|  3|2023-12-31|2023-12-31 00:00:00|  2025-09-25|2025-09-25 04:32:...|\n",
+            "+---+----------+-------------------+------------+--------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "fmt_df = df.select(\"id\",\n",
+        "                   F.to_date(\"date_str\").alias(\"dates\"),\n",
+        "                   F.to_timestamp(\"ts_str\").alias(\"timestamp\"),\n",
+        "                   F.date_format('ts_str', \"yyyy/MM/dd HH:mm\").alias(\"Dates\"))"
+      ],
+      "metadata": {
+        "id": "9Fv0S5NHCf9w"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "fmt_df.show(\n",
+        "\n",
+        ")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "QYiumS26Cf3g",
+        "outputId": "c8e94be2-691b-4099-98fa-ebf219abd919"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+-------------------+----------------+\n",
+            "| id|     dates|          timestamp|           Dates|\n",
+            "+---+----------+-------------------+----------------+\n",
+            "|  1|2025-09-15|2025-09-15 08:45:30|2025/09/15 08:45|\n",
+            "|  2|2024-02-29|2024-02-29 23:59:59|2024/02/29 23:59|\n",
+            "|  3|2023-12-31|2023-12-31 00:00:00|2023/12/31 00:00|\n",
+            "+---+----------+-------------------+----------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. write a program to demonstrate Pyspark datediff() functions uses."
+      ],
+      "metadata": {
+        "id": "fH-_QhQlJyKu"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "u4u4GBA2JyHH"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "ZXcUx1ljJyDj"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    # id, start_date, end_date\n",
+        "    (\"A\", \"2025-09-01\", \"2025-09-15\"),   # positive span\n",
+        "    (\"B\", \"2025-09-15\", \"2025-09-01\"),   # negative span\n",
+        "    (\"C\", \"2024-02-29\", \"2025-03-01\"),   # leap-day start\n",
+        "    (\"D\", \"2023-12-31\", \"2024-01-01\"),   # year boundary        # null end\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "17dduscpJyAr"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data, ['id', 'start_date', 'end_date'])\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "_yAvS_aGJx9C",
+        "outputId": "b4769861-e718-4484-8f3a-2f21263f02b4"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+----------+\n",
+            "| id|start_date|  end_date|\n",
+            "+---+----------+----------+\n",
+            "|  A|2025-09-01|2025-09-15|\n",
+            "|  B|2025-09-15|2025-09-01|\n",
+            "|  C|2024-02-29|2025-03-01|\n",
+            "|  D|2023-12-31|2024-01-01|\n",
+            "+---+----------+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1 = df.withColumn(\"start_date\", F.to_date(\"start_date\"))\\\n",
+        "        .withColumn('end_date', F.to_date('end_date'))\n",
+        "\n",
+        "df1.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Mp-Ti_kMJxlP",
+        "outputId": "34f234ae-694e-403e-e761-ca5b49c93f8d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+----------+\n",
+            "| id|start_date|  end_date|\n",
+            "+---+----------+----------+\n",
+            "|  A|2025-09-01|2025-09-15|\n",
+            "|  B|2025-09-15|2025-09-01|\n",
+            "|  C|2024-02-29|2025-03-01|\n",
+            "|  D|2023-12-31|2024-01-01|\n",
+            "+---+----------+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "start_end_diff = df1.select(\"id\", \"start_date\", \"end_date\",\n",
+        "                            F.datediff('start_date', 'end_date').alias(\"total_diff\"))\n",
+        "start_end_diff.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "n2QYsGAzJxi1",
+        "outputId": "6c413def-477c-4668-95f8-c90beb87ac38"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+----------+----------+\n",
+            "| id|start_date|  end_date|total_diff|\n",
+            "+---+----------+----------+----------+\n",
+            "|  A|2025-09-01|2025-09-15|       -14|\n",
+            "|  B|2025-09-15|2025-09-01|        14|\n",
+            "|  C|2024-02-29|2025-03-01|      -366|\n",
+            "|  D|2023-12-31|2024-01-01|        -1|\n",
+            "+---+----------+----------+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "today_diff = df1.select(\"id\", 'start_date', 'end_date',\n",
+        "                        F.datediff(F.current_date(), \"start_date\").alias(\"new_diff\"))\n",
+        "today_diff.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2abrb0TYJxgo",
+        "outputId": "1739bab4-93f5-4336-de47-833261b0723f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+----------+--------+\n",
+            "| id|start_date|  end_date|new_diff|\n",
+            "+---+----------+----------+--------+\n",
+            "|  A|2025-09-01|2025-09-15|      24|\n",
+            "|  B|2025-09-15|2025-09-01|      10|\n",
+            "|  C|2024-02-29|2025-03-01|     574|\n",
+            "|  D|2023-12-31|2024-01-01|     634|\n",
+            "+---+----------+----------+--------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. Write a program to demonstrate Pyspark timestamp & date utitilies"
+      ],
+      "metadata": {
+        "id": "fGarG42GJxeR"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "LDZyIpRiJxar"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"exams\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "gdZwdVARJxW-"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"1\", \"2025-09-25\", \"2025-09-25 10:30:45\"),\n",
+        "    (\"2\", \"2024-02-29\", \"2024-02-29 23:59:59\"),\n",
+        "    (\"3\", \"2023-12-31\", \"2023-12-31 00:00:00\"),\n",
+        "]"
+      ],
+      "metadata": {
+        "id": "TtjjGSM5JxTp"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data, ['id', 'date_str', 'ts_str'])"
+      ],
+      "metadata": {
+        "id": "c2CTb_7yJw-L"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Rk37buJ5Mq-x",
+        "outputId": "a4a0bcef-d1de-4795-9416-e15840ac47e5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+-------------------+\n",
+            "| id|  date_str|             ts_str|\n",
+            "+---+----------+-------------------+\n",
+            "|  1|2025-09-25|2025-09-25 10:30:45|\n",
+            "|  2|2024-02-29|2024-02-29 23:59:59|\n",
+            "|  3|2023-12-31|2023-12-31 00:00:00|\n",
+            "+---+----------+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "curr = df.select(\"id\",\n",
+        "                 F.current_date().alias(\"Current date\"),\n",
+        "                 F.current_timestamp().alias(\"Current timestamp\"))\n",
+        "curr.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "abZlEyX-Mq7I",
+        "outputId": "9b9d948e-f533-4c81-cda7-cf55cfc3b261"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+------------+--------------------+\n",
+            "| id|Current date|   Current timestamp|\n",
+            "+---+------------+--------------------+\n",
+            "|  1|  2025-09-25|2025-09-25 04:50:...|\n",
+            "|  2|  2025-09-25|2025-09-25 04:50:...|\n",
+            "|  3|  2025-09-25|2025-09-25 04:50:...|\n",
+            "+---+------------+--------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "fmt_df = df.select(\"id\",\n",
+        "                   F.to_date(\"date_str\").alias('date_convert'),\n",
+        "                   F.to_timestamp(\"ts_str\").alias(\"ts_convert\"))"
+      ],
+      "metadata": {
+        "id": "Rm0dYZ02Mq3y"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "fmt_df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qgjGWz7OMq0V",
+        "outputId": "2c7063f2-081b-4299-beab-cd6ee438578a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+------------+-------------------+\n",
+            "| id|date_convert|         ts_convert|\n",
+            "+---+------------+-------------------+\n",
+            "|  1|  2025-09-25|2025-09-25 10:30:45|\n",
+            "|  2|  2024-02-29|2024-02-29 23:59:59|\n",
+            "|  3|  2023-12-31|2023-12-31 00:00:00|\n",
+            "+---+------------+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "date_parts = fmt_df.select(\"id\",\n",
+        "                       F.year('date_convert').alias(\"year\"),\n",
+        "                           F.month('date_convert').alias(\"month\"))\n",
+        "\n",
+        "date_parts.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "tx_72epFMqxM",
+        "outputId": "08c21c3a-2776-4a35-8131-e542e7576112"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----+-----+\n",
+            "| id|year|month|\n",
+            "+---+----+-----+\n",
+            "|  1|2025|    9|\n",
+            "|  2|2024|    2|\n",
+            "|  3|2023|   12|\n",
+            "+---+----+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### D. write a programme to demonstrate Pyspark time difference utitlity"
+      ],
+      "metadata": {
+        "id": "n26bK1hKMqt0"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "g-0OtVrLMqqh"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"Exams\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "-yBe1M3JMqnl"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"A\", \"2025-09-25 09:00:00\", \"2025-09-25 10:30:45\"),\n",
+        "    (\"B\", \"2025-09-24 23:59:59\", \"2025-09-25 00:00:10\"),\n",
+        "    (\"C\", \"2025-03-29 01:15:00\", \"2025-03-29 03:45:00\")\n",
+        "]\n",
+        "\n",
+        "df = spark.createDataFrame(data, ['id', 'start_str', 'end_str'])\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "omcj38jzMqkO",
+        "outputId": "8d6b5cf5-4d37-4744-a384-6815f19a0909"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-------------------+-------------------+\n",
+            "| id|          start_str|            end_str|\n",
+            "+---+-------------------+-------------------+\n",
+            "|  A|2025-09-25 09:00:00|2025-09-25 10:30:45|\n",
+            "|  B|2025-09-24 23:59:59|2025-09-25 00:00:10|\n",
+            "|  C|2025-03-29 01:15:00|2025-03-29 03:45:00|\n",
+            "+---+-------------------+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "ts = df.select(\"id\",\n",
+        "               F.to_date('start_str').alias(\"dates\"),\n",
+        "               F.to_date('end_str').alias('ends'))\n",
+        "ts.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Qx3TT7VWMqgr",
+        "outputId": "014e6082-097b-48b2-d25f-92836f92be32"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+----------+\n",
+            "| id|     dates|      ends|\n",
+            "+---+----------+----------+\n",
+            "|  A|2025-09-25|2025-09-25|\n",
+            "|  B|2025-09-24|2025-09-25|\n",
+            "|  C|2025-03-29|2025-03-29|\n",
+            "+---+----------+----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "diff = ts.select(\"id\",\n",
+        "                 (F.col(\"dates\") - F.col('ends')),\n",
+        "                 (F.col(\"ends\") - F.col('dates')))\n",
+        "\n",
+        "diff.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "DZyWgKeTPNuf",
+        "outputId": "fe5d6bef-3d84-49b4-da2f-f397cc7f150b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-----------------+----------------+\n",
+            "| id|   (dates - ends)|  (ends - dates)|\n",
+            "+---+-----------------+----------------+\n",
+            "|  A| INTERVAL '0' DAY|INTERVAL '0' DAY|\n",
+            "|  B|INTERVAL '-1' DAY|INTERVAL '1' DAY|\n",
+            "|  C| INTERVAL '0' DAY|INTERVAL '0' DAY|\n",
+            "+---+-----------------+----------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# diff in hour, min, sec\n",
+        "diff = ts.select(\"id\",\n",
+        "                 (F.col(\"dates\") - F.col('ends')),\n",
+        "                 (F.col(\"dates\") - F.col('ends'))/60,\n",
+        "                 (F.col(\"dates\") - F.col('ends'))/3600)"
+      ],
+      "metadata": {
+        "id": "UsQpgNYfPNkh"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "diff.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ns5Iyb5ZPNiC",
+        "outputId": "d20a801c-8cd3-4e93-a13a-944a97859f5e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-----------------+---------------------+-----------------------+\n",
+            "| id|   (dates - ends)|((dates - ends) / 60)|((dates - ends) / 3600)|\n",
+            "+---+-----------------+---------------------+-----------------------+\n",
+            "|  A| INTERVAL '0' DAY| INTERVAL '0 00:00...|   INTERVAL '0 00:00...|\n",
+            "|  B|INTERVAL '-1' DAY| INTERVAL '-0 00:2...|   INTERVAL '-0 00:0...|\n",
+            "|  C| INTERVAL '0' DAY| INTERVAL '0 00:00...|   INTERVAL '0 00:00...|\n",
+            "+---+-----------------+---------------------+-----------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 6"
+      ],
+      "metadata": {
+        "id": "mO459xYKPNe_"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. write a programme to demonstrate pyspark SQL join with Options"
+      ],
+      "metadata": {
+        "id": "e8YJ8-b1Qmtr"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "J45lcpj9QmZe"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"exams\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "Y12mVTjDQmLS"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "emp_data = [\n",
+        "        (101, \"John\", 1),\n",
+        "        (102, \"Lisa\", 2),\n",
+        "        (103, \"Paul\", 3),\n",
+        "        (104, \"Evan\", 4),\n",
+        "        (105, \"Chloe\", 5),\n",
+        "        (106, \"Amy\", 6),\n",
+        "    ]\n",
+        "emp_df = spark.createDataFrame(emp_data, ['id', 'name', 'deptno'])"
+      ],
+      "metadata": {
+        "id": "aHwhmVY6RC1t"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "dept_data = [\n",
+        "        (1,  \"Marketing\"),\n",
+        "        (2,  \"Sales\"),\n",
+        "        (3,  \"Engineering\"),\n",
+        "    ]\n",
+        "dept_df = spark.createDataFrame(dept_data,[\"deptno\", \"deptname\"])"
+      ],
+      "metadata": {
+        "id": "LEz4jRdKRCyL"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "emp_df.createOrReplaceTempView(\"employee\")\n",
+        "dept_df.createOrReplaceTempView(\"department\")"
+      ],
+      "metadata": {
+        "id": "03OFgpv_RCu-"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Inner Join\n",
+        "inner = spark.sql(\"\"\"\n",
+        "SELECT * FROM employee E\n",
+        "INNER JOIN department D\n",
+        "ON e.deptno = d.deptno\"\"\")\n",
+        "inner.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "x4HXI-ieRCpn",
+        "outputId": "f7d8737c-8390-47ad-9bf5-25da25d628ae"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----+------+------+-----------+\n",
+            "| id|name|deptno|deptno|   deptname|\n",
+            "+---+----+------+------+-----------+\n",
+            "|101|John|     1|     1|  Marketing|\n",
+            "|102|Lisa|     2|     2|      Sales|\n",
+            "|103|Paul|     3|     3|Engineering|\n",
+            "+---+----+------+------+-----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# left join\n",
+        "left = spark.sql(\"\"\"\n",
+        "SELECT *\n",
+        "FROM employee e\n",
+        "LEFT JOIN department d\n",
+        "ON e.deptno = d.deptno\n",
+        "\"\"\")\n",
+        "left.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "J2Mk1CLTRCmI",
+        "outputId": "febd594c-5a5a-4118-84d9-785fbd47dce7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-----+------+------+-----------+\n",
+            "| id| name|deptno|deptno|   deptname|\n",
+            "+---+-----+------+------+-----------+\n",
+            "|101| John|     1|     1|  Marketing|\n",
+            "|103| Paul|     3|     3|Engineering|\n",
+            "|102| Lisa|     2|     2|      Sales|\n",
+            "|106|  Amy|     6|  NULL|       NULL|\n",
+            "|105|Chloe|     5|  NULL|       NULL|\n",
+            "|104| Evan|     4|  NULL|       NULL|\n",
+            "+---+-----+------+------+-----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# right join\n",
+        "right = spark.sql(\"\"\"\n",
+        "SELECT *\n",
+        "FROM employee e\n",
+        "RIGHT JOIN department d\n",
+        "ON e.deptno = d.deptno\n",
+        "\"\"\")\n",
+        "\n",
+        "right.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "mmslBG-HRCin",
+        "outputId": "13127d3e-d301-42b1-fc9c-efbef510b9d1"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----+------+------+-----------+\n",
+            "| id|name|deptno|deptno|   deptname|\n",
+            "+---+----+------+------+-----------+\n",
+            "|101|John|     1|     1|  Marketing|\n",
+            "|103|Paul|     3|     3|Engineering|\n",
+            "|102|Lisa|     2|     2|      Sales|\n",
+            "+---+----+------+------+-----------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. write a pyspark programme to demonstrate Join on multiple dataframes with options"
+      ],
+      "metadata": {
+        "id": "Un2wCTXLRCfV"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "aS6wqkXKRCcm"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"Mulitple\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "1-JLG5QYRCY-"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "customers = spark.createDataFrame(\n",
+        "    [\n",
+        "        (1, \"Arjun\", \"BLR\"),\n",
+        "        (2, \"Neha\", \"PUN\"),\n",
+        "        (3, \"Vikram\", \"HYD\"),\n",
+        "        (4, \"Isha\",  \"BLR\"),\n",
+        "    ],\n",
+        "    [\"cust_id\", \"cust_name\", \"home_loc\"]\n",
+        ")\n",
+        "\n",
+        "orders = spark.createDataFrame(\n",
+        "    [\n",
+        "        (100, 1, \"2025-09-24\", \"BLR\"),\n",
+        "        (101, 1, \"2025-09-25\", \"BLR\"),\n",
+        "        (102, 2, \"2025-09-25\", \"DEL\"),\n",
+        "        (103, 3, \"2025-09-23\", \"HYD\"),\n",
+        "        (104, 5, \"2025-09-22\", \"BLR\"),  # no matching customer\n",
+        "    ],\n",
+        "    [\"order_id\", \"cust_id\", \"order_date\", \"ship_loc\"]\n",
+        ")\n",
+        "\n",
+        "payments = spark.createDataFrame(\n",
+        "    [\n",
+        "        (100, \"UPI\",  499.00),\n",
+        "        (101, \"CARD\", 799.50),\n",
+        "        (103, \"COD\",  250.00),\n",
+        "        (105, \"UPI\",  199.00),  # no matching order\n",
+        "    ],\n",
+        "    [\"order_id\", \"method\", \"amount\"]\n",
+        ")\n",
+        "\n",
+        "locations = spark.createDataFrame(\n",
+        "    [\n",
+        "        (\"BLR\", \"Bengaluru\", \"KA\"),\n",
+        "        (\"HYD\", \"Hyderabad\", \"TS\"),\n",
+        "        (\"PUN\", \"Pune\", \"MH\"),\n",
+        "        (\"DEL\", \"Delhi\", \"DL\"),\n",
+        "    ],\n",
+        "    [\"loc\", \"city\", \"state\"]\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "mfxQ6fRWPNcP"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(\"=== Input ===\")\n",
+        "customers.show()\n",
+        "orders.show()\n",
+        "payments.show()\n",
+        "locations.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "f0_q3v7EPNYr",
+        "outputId": "1e9f1453-cf52-41f5-be48-63f7457145a7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "=== Input ===\n",
+            "+-------+---------+--------+\n",
+            "|cust_id|cust_name|home_loc|\n",
+            "+-------+---------+--------+\n",
+            "|      1|    Arjun|     BLR|\n",
+            "|      2|     Neha|     PUN|\n",
+            "|      3|   Vikram|     HYD|\n",
+            "|      4|     Isha|     BLR|\n",
+            "+-------+---------+--------+\n",
+            "\n",
+            "+--------+-------+----------+--------+\n",
+            "|order_id|cust_id|order_date|ship_loc|\n",
+            "+--------+-------+----------+--------+\n",
+            "|     100|      1|2025-09-24|     BLR|\n",
+            "|     101|      1|2025-09-25|     BLR|\n",
+            "|     102|      2|2025-09-25|     DEL|\n",
+            "|     103|      3|2025-09-23|     HYD|\n",
+            "|     104|      5|2025-09-22|     BLR|\n",
+            "+--------+-------+----------+--------+\n",
+            "\n",
+            "+--------+------+------+\n",
+            "|order_id|method|amount|\n",
+            "+--------+------+------+\n",
+            "|     100|   UPI| 499.0|\n",
+            "|     101|  CARD| 799.5|\n",
+            "|     103|   COD| 250.0|\n",
+            "|     105|   UPI| 199.0|\n",
+            "+--------+------+------+\n",
+            "\n",
+            "+---+---------+-----+\n",
+            "|loc|     city|state|\n",
+            "+---+---------+-----+\n",
+            "|BLR|Bengaluru|   KA|\n",
+            "|HYD|Hyderabad|   TS|\n",
+            "|PUN|     Pune|   MH|\n",
+            "|DEL|    Delhi|   DL|\n",
+            "+---+---------+-----+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Chain mulitple joins\n",
+        "cust_orders = customers.join(orders, on = 'cust_id', how='inner')\n",
+        "cust_order_pay = cust_orders.join(payments, on = 'order_id', how='left')"
+      ],
+      "metadata": {
+        "id": "nYmbuLBnTVG0"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "cust_orders.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "BcmVBSKNTVDy",
+        "outputId": "f48ee645-d4d1-44d0-a801-cc116b8947e0"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+---------+--------+--------+----------+--------+\n",
+            "|cust_id|cust_name|home_loc|order_id|order_date|ship_loc|\n",
+            "+-------+---------+--------+--------+----------+--------+\n",
+            "|      1|    Arjun|     BLR|     100|2025-09-24|     BLR|\n",
+            "|      1|    Arjun|     BLR|     101|2025-09-25|     BLR|\n",
+            "|      2|     Neha|     PUN|     102|2025-09-25|     DEL|\n",
+            "|      3|   Vikram|     HYD|     103|2025-09-23|     HYD|\n",
+            "+-------+---------+--------+--------+----------+--------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "cust_order_pay.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "cwBlXy5nTVBB",
+        "outputId": "623d1f1c-6425-4644-9c1e-c2b0280508b8"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+--------+-------+---------+--------+----------+--------+------+------+\n",
+            "|order_id|cust_id|cust_name|home_loc|order_date|ship_loc|method|amount|\n",
+            "+--------+-------+---------+--------+----------+--------+------+------+\n",
+            "|     103|      3|   Vikram|     HYD|2025-09-23|     HYD|   COD| 250.0|\n",
+            "|     100|      1|    Arjun|     BLR|2025-09-24|     BLR|   UPI| 499.0|\n",
+            "|     101|      1|    Arjun|     BLR|2025-09-25|     BLR|  CARD| 799.5|\n",
+            "|     102|      2|     Neha|     PUN|2025-09-25|     DEL|  NULL|  NULL|\n",
+            "+--------+-------+---------+--------+----------+--------+------+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. write a pyspark programme to demonstrate pyspark Join Multiple columns with Options"
+      ],
+      "metadata": {
+        "id": "dOB1n9YrTU95"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F\n",
+        "from functools import reduce\n",
+        "from operator import and_"
+      ],
+      "metadata": {
+        "id": "Nu1Mdwn2PNSt"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"Joins\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "OFBBV93vU4Yh"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "left = spark.createDataFrame(\n",
+        "    [\n",
+        "        (1, \"A\", \"2025-09-25\", 10.0, None),\n",
+        "        (2, \"B\", \"2025-09-24\", 20.0, \"X\"),\n",
+        "        (3, \"C\", \"2025-09-23\", 30.0, \"Y\"),\n",
+        "        (4, \"B\", \"2025-09-22\", 40.0, None),\n",
+        "    ],\n",
+        "    [\"id\", \"cat\", \"dt\", \"amount\", \"tag\"]\n",
+        ")\n",
+        "\n",
+        "right = spark.createDataFrame(\n",
+        "    [\n",
+        "        (1, \"A\", \"2025-09-25\", \"paid\",  \"IN\"),\n",
+        "        (2, \"B\", \"2025-09-24\", \"refund\",\"IN\"),\n",
+        "        (2, \"B\", \"2025-09-24\", \"paid\",  \"US\"),   # duplicate key row to show multiplicity\n",
+        "        (4, \"B\", \"2025-09-22\", \"paid\",  \"IN\"),\n",
+        "        (5, \"Z\", \"2025-09-21\", \"paid\",  \"IN\"),\n",
+        "    ],\n",
+        "    [\"id\", \"cat\", \"dt\", \"status\", \"country\"]\n",
+        ")\n",
+        "\n",
+        "print(\"=== Input ===\")\n",
+        "left.show()\n",
+        "right.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "M5rVUrCJU4VQ",
+        "outputId": "05af19ba-aeae-449b-fff0-5bd67d1ceb7a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "=== Input ===\n",
+            "+---+---+----------+------+----+\n",
+            "| id|cat|        dt|amount| tag|\n",
+            "+---+---+----------+------+----+\n",
+            "|  1|  A|2025-09-25|  10.0|NULL|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|\n",
+            "|  3|  C|2025-09-23|  30.0|   Y|\n",
+            "|  4|  B|2025-09-22|  40.0|NULL|\n",
+            "+---+---+----------+------+----+\n",
+            "\n",
+            "+---+---+----------+------+-------+\n",
+            "| id|cat|        dt|status|country|\n",
+            "+---+---+----------+------+-------+\n",
+            "|  1|  A|2025-09-25|  paid|     IN|\n",
+            "|  2|  B|2025-09-24|refund|     IN|\n",
+            "|  2|  B|2025-09-24|  paid|     US|\n",
+            "|  4|  B|2025-09-22|  paid|     IN|\n",
+            "|  5|  Z|2025-09-21|  paid|     IN|\n",
+            "+---+---+----------+------+-------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# multikey inner join\n",
+        "inner = left.join(right, on=['id', 'cat', 'dt'], how='inner')\n",
+        "inner.show()\n",
+        "\n",
+        "# multikey left join\n",
+        "left_join = left.join(right, on=['id', 'cat', 'dt'], how='left')\n",
+        "left_join.show()\n",
+        "\n",
+        "# multikey right join\n",
+        "right_join = left.join(right, on=['id', 'cat', 'dt'], how='right')\n",
+        "right_join.show()\n",
+        "\n",
+        "# multikey outer join\n",
+        "outer_join = left.join(right, on=['id', 'cat', 'dt'], how='outer')\n",
+        "outer_join.show()\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "nvLg0gdmU4SI",
+        "outputId": "b6ec7030-b08c-4499-f85b-f4efa3e30cf8"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+---+----------+------+----+------+-------+\n",
+            "| id|cat|        dt|amount| tag|status|country|\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "|  1|  A|2025-09-25|  10.0|NULL|  paid|     IN|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|refund|     IN|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|  paid|     US|\n",
+            "|  4|  B|2025-09-22|  40.0|NULL|  paid|     IN|\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "| id|cat|        dt|amount| tag|status|country|\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "|  1|  A|2025-09-25|  10.0|NULL|  paid|     IN|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|  paid|     US|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|refund|     IN|\n",
+            "|  3|  C|2025-09-23|  30.0|   Y|  NULL|   NULL|\n",
+            "|  4|  B|2025-09-22|  40.0|NULL|  paid|     IN|\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "| id|cat|        dt|amount| tag|status|country|\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "|  1|  A|2025-09-25|  10.0|NULL|  paid|     IN|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|refund|     IN|\n",
+            "|  5|  Z|2025-09-21|  NULL|NULL|  paid|     IN|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|  paid|     US|\n",
+            "|  4|  B|2025-09-22|  40.0|NULL|  paid|     IN|\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "| id|cat|        dt|amount| tag|status|country|\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "|  1|  A|2025-09-25|  10.0|NULL|  paid|     IN|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|refund|     IN|\n",
+            "|  2|  B|2025-09-24|  20.0|   X|  paid|     US|\n",
+            "|  3|  C|2025-09-23|  30.0|   Y|  NULL|   NULL|\n",
+            "|  4|  B|2025-09-22|  40.0|NULL|  paid|     IN|\n",
+            "|  5|  Z|2025-09-21|  NULL|NULL|  paid|     IN|\n",
+            "+---+---+----------+------+----+------+-------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 7"
+      ],
+      "metadata": {
+        "id": "-zIWrfd0bkfQ"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. write program to demonstrate pyspark map() with options"
+      ],
+      "metadata": {
+        "id": "3zJqfHfdbkaK"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession, Row\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "enhPKfFXbkKY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "4T6NVfGJcBw2"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data1 = [1,2,3,5,5,6,4]\n",
+        "nums = spark.sparkContext.parallelize(data1)"
+      ],
+      "metadata": {
+        "id": "D0yB8kZBbkG3"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "nums = nums.map(lambda x: x*x)\n",
+        "nums.collect()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "z7ASwHqGbkEL",
+        "outputId": "edfaee33-17f7-485f-db5e-70c4b9dd3f5e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[1, 4, 9, 25, 25, 36, 16]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 115
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "words = spark.sparkContext.parallelize([\"spark\", \"map\", \"example\", \"map\"])\n",
+        "pairs = words.map(lambda w: (w, 1))\n",
+        "print(\"Pairs:\", pairs.collect())"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "LigeeH_-bkBh",
+        "outputId": "9ee72d66-df16-41d1-d303-9a6204975012"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Pairs: [('spark', 1), ('map', 1), ('example', 1), ('map', 1)]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. write a programme to demonstrate Window functions with options"
+      ],
+      "metadata": {
+        "id": "cr5wvKD-bj-l"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F\n",
+        "from pyspark.sql.window import Window"
+      ],
+      "metadata": {
+        "id": "xghXpSb_bj4v"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"WindowFunctions\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "6XILbcstbj1w"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"A\", \"2025-09-01\", \"u1\", 100.0),\n",
+        "    (\"A\", \"2025-09-02\", \"u1\", 150.0),\n",
+        "    (\"A\", \"2025-09-03\", \"u2\",  90.0),\n",
+        "    (\"A\", \"2025-09-04\", \"u2\",  90.0),\n",
+        "    (\"B\", \"2025-09-01\", \"u3\", 200.0),\n",
+        "    (\"B\", \"2025-09-02\", \"u3\", 180.0),\n",
+        "    (\"B\", \"2025-09-03\", \"u4\", 220.0),\n",
+        "    (\"B\", \"2025-09-04\", \"u4\", 220.0),\n",
+        "]\n",
+        "df = spark.createDataFrame(data, [\"grp\", \"dt\", \"user\", \"amount\"])"
+      ],
+      "metadata": {
+        "id": "EONLaBmmbjxc"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1 = df.withColumn(\"dt\", F.to_date('dt'))\n",
+        "df1.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "WdGx076ybjof",
+        "outputId": "a55dab0c-8949-4683-d150-dfdb30db97bd"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+----+------+\n",
+            "|grp|        dt|user|amount|\n",
+            "+---+----------+----+------+\n",
+            "|  A|2025-09-01|  u1| 100.0|\n",
+            "|  A|2025-09-02|  u1| 150.0|\n",
+            "|  A|2025-09-03|  u2|  90.0|\n",
+            "|  A|2025-09-04|  u2|  90.0|\n",
+            "|  B|2025-09-01|  u3| 200.0|\n",
+            "|  B|2025-09-02|  u3| 180.0|\n",
+            "|  B|2025-09-03|  u4| 220.0|\n",
+            "|  B|2025-09-04|  u4| 220.0|\n",
+            "+---+----------+----+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "order_window = Window.partitionBy('grp').orderBy(\"amount\")"
+      ],
+      "metadata": {
+        "id": "hpBEdT2CdicF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# ranking functions\n",
+        "\n",
+        "ranked = (\n",
+        "    df.withColumn(\"row number\", F.row_number().over(order_window)).\\\n",
+        "      withColumn(\"rank\", F.rank().over(order_window)).\\\n",
+        "      withColumn(\"dense_rank\", F.dense_rank().over(order_window)).\\\n",
+        "      withColumn(\"percent_rank\", F.percent_rank().over(order_window))\n",
+        ")\n",
+        "\n",
+        "ranked.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2KiocjKTdiZK",
+        "outputId": "c2168907-da16-45c5-d124-3bb662af9397"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+----------+----+------+----------+----+----------+------------------+\n",
+            "|grp|        dt|user|amount|row number|rank|dense_rank|      percent_rank|\n",
+            "+---+----------+----+------+----------+----+----------+------------------+\n",
+            "|  A|2025-09-03|  u2|  90.0|         1|   1|         1|               0.0|\n",
+            "|  A|2025-09-04|  u2|  90.0|         2|   1|         1|               0.0|\n",
+            "|  A|2025-09-01|  u1| 100.0|         3|   3|         2|0.6666666666666666|\n",
+            "|  A|2025-09-02|  u1| 150.0|         4|   4|         3|               1.0|\n",
+            "|  B|2025-09-02|  u3| 180.0|         1|   1|         1|               0.0|\n",
+            "|  B|2025-09-01|  u3| 200.0|         2|   2|         2|0.3333333333333333|\n",
+            "|  B|2025-09-03|  u4| 220.0|         3|   3|         3|0.6666666666666666|\n",
+            "|  B|2025-09-04|  u4| 220.0|         4|   3|         3|0.6666666666666666|\n",
+            "+---+----------+----+------+----------+----+----------+------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. write a programme to demonstrate Pyspark JSON functions with options"
+      ],
+      "metadata": {
+        "id": "DMqGCzj7diVw"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F\n",
+        "from pyspark.sql.types import StructType, StructField, StringType, LongType"
+      ],
+      "metadata": {
+        "id": "kQ6utejKdiSX"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"Exams\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "Q2OGEnkYdiOq"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (1, '{\"id\": 1, \"name\": \"Arjun\", \"addr\": {\"city\": \"Bengaluru\", \"pin\": 560001}, \"tags\": [\"ml\",\"cv\"], \"meta\": {\"a\": 10}}'),\n",
+        "    (2, '{\"id\": 2, \"name\": \"Neha\", \"addr\": {\"city\": \"Pune\", \"pin\": 411001}, \"tags\": [\"de\"], \"meta\": {\"a\": 20}}'),\n",
+        "    (3, '{\"id\": 3, \"name\": null, \"addr\": {\"city\": \"Hyderabad\", \"pin\": 500001}, \"tags\": [], \"meta\": {\"a\": 30}}'),\n",
+        "    (4, '{\"id\": 4, \"name\": \"Isha\", \"addr\": {\"city\": \"Delhi\", \"pin\": \"110001\"}, \"tags\": [\"ai\",\"health\"], \"meta\": {\"a\": \"oops\"}}'),  # mixed types\n",
+        "]\n",
+        "df = spark.createDataFrame(data, [\"row_id\", \"json_str\"])"
+      ],
+      "metadata": {
+        "id": "15sjyO58dh0I"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show(truncate=False)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "17hxHLTGdhw1",
+        "outputId": "e098438e-92bf-4277-d07c-82d96d0acca8"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------+---------------------------------------------------------------------------------------------------------------------+\n",
+            "|row_id|json_str                                                                                                             |\n",
+            "+------+---------------------------------------------------------------------------------------------------------------------+\n",
+            "|1     |{\"id\": 1, \"name\": \"Arjun\", \"addr\": {\"city\": \"Bengaluru\", \"pin\": 560001}, \"tags\": [\"ml\",\"cv\"], \"meta\": {\"a\": 10}}     |\n",
+            "|2     |{\"id\": 2, \"name\": \"Neha\", \"addr\": {\"city\": \"Pune\", \"pin\": 411001}, \"tags\": [\"de\"], \"meta\": {\"a\": 20}}                |\n",
+            "|3     |{\"id\": 3, \"name\": null, \"addr\": {\"city\": \"Hyderabad\", \"pin\": 500001}, \"tags\": [], \"meta\": {\"a\": 30}}                 |\n",
+            "|4     |{\"id\": 4, \"name\": \"Isha\", \"addr\": {\"city\": \"Delhi\", \"pin\": \"110001\"}, \"tags\": [\"ai\",\"health\"], \"meta\": {\"a\": \"oops\"}}|\n",
+            "+------+---------------------------------------------------------------------------------------------------------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "schema = StructType([\n",
+        "    StructField(\"id\", LongType(), True),\n",
+        "    StructField(\"name\", StringType(), True),\n",
+        "    StructField(\"addr\", StructType([\n",
+        "        StructField('city', StringType(), True) ,\n",
+        "        StructField(\"pin\", LongType(), True)\n",
+        "    ]), True),\n",
+        "])"
+      ],
+      "metadata": {
+        "id": "oQ7hBu8RdhkJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "parsed = df.withColumn(\"obj\", F.from_json(\"json_str\", schema))\n",
+        "parsed.select(\"row_id\", \"obj.*\").show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9GgndK_niH2C",
+        "outputId": "fe849d4f-2d5e-427c-9bc7-535f56498092"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------+---+-----+-------------------+\n",
+            "|row_id| id| name|               addr|\n",
+            "+------+---+-----+-------------------+\n",
+            "|     1|  1|Arjun|{Bengaluru, 560001}|\n",
+            "|     2|  2| Neha|     {Pune, 411001}|\n",
+            "|     3|  3| NULL|{Hyderabad, 500001}|\n",
+            "|     4|  4| Isha|      {Delhi, NULL}|\n",
+            "+------+---+-----+-------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "extracted = df.select(\"row_id\",\n",
+        "                      F.get_json_object(\"json_str\", \"$.addr.city\").alias('city'))\n",
+        "extracted.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "r_Yw4vFfiHy0",
+        "outputId": "b7627ade-4c8e-4bc5-f0c6-835bfa3dc184"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+------+---------+\n",
+            "|row_id|     city|\n",
+            "+------+---------+\n",
+            "|     1|Bengaluru|\n",
+            "|     2|     Pune|\n",
+            "|     3|Hyderabad|\n",
+            "|     4|    Delhi|\n",
+            "+------+---------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 8 --- Pending"
+      ],
+      "metadata": {
+        "id": "7SUJHQoj6Ver"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. Write a program to demonstrate PySpark SQL ex."
+      ],
+      "metadata": {
+        "id": "uWflsT-qKHmH"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession"
+      ],
+      "metadata": {
+        "id": "AWF3wrpZKNPg"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "hRcFZyovKlD7"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"James\", \"Smith\", \"USA\", \"CA\", 90000),\n",
+        "    (\"Michael\", \"Rose\", \"USA\", \"NY\", 120000),\n",
+        "    (\"Robert\", \"Williams\", \"USA\", \"CA\", 95000),\n",
+        "    (\"Maria\", \"Jones\", \"USA\", \"FL\", 88000),\n",
+        "    (\"Jen\", \"Brown\", \"USA\", \"NY\", 99000)\n",
+        "]\n",
+        "cols = [\"firstname\", \"lastname\", \"country\", \"state\", \"salary\"]"
+      ],
+      "metadata": {
+        "id": "yXlKhQtMKrOl"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data, cols)"
+      ],
+      "metadata": {
+        "id": "XtMgNrr3Kzpu"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.show(truncate=False)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "XMM8oDGkK2bL",
+        "outputId": "7c7b9858-6982-4d3d-dd64-38101b0a5d49"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+-------+-----+------+\n",
+            "|firstname|lastname|country|state|salary|\n",
+            "+---------+--------+-------+-----+------+\n",
+            "|James    |Smith   |USA    |CA   |90000 |\n",
+            "|Michael  |Rose    |USA    |NY   |120000|\n",
+            "|Robert   |Williams|USA    |CA   |95000 |\n",
+            "|Maria    |Jones   |USA    |FL   |88000 |\n",
+            "|Jen      |Brown   |USA    |NY   |99000 |\n",
+            "+---------+--------+-------+-----+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.createOrReplaceTempView(\"Exams\")"
+      ],
+      "metadata": {
+        "id": "6dIg4RhjLDLD"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select(['firstname', 'lastname', 'country', 'state', 'salary']).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6YPuG9GWK4bB",
+        "outputId": "1500548e-b9c5-4b0b-f652-e5a6ab997514"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+-------+-----+------+\n",
+            "|firstname|lastname|country|state|salary|\n",
+            "+---------+--------+-------+-----+------+\n",
+            "|    James|   Smith|    USA|   CA| 90000|\n",
+            "|  Michael|    Rose|    USA|   NY|120000|\n",
+            "|   Robert|Williams|    USA|   CA| 95000|\n",
+            "|    Maria|   Jones|    USA|   FL| 88000|\n",
+            "|      Jen|   Brown|    USA|   NY| 99000|\n",
+            "+---------+--------+-------+-----+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark.sql('SELECT * FROM Exams').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9kWQGwtvLNk0",
+        "outputId": "7c8a2088-48e3-43dd-abfe-9de302b10e2c"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+-------+-----+------+\n",
+            "|firstname|lastname|country|state|salary|\n",
+            "+---------+--------+-------+-----+------+\n",
+            "|    James|   Smith|    USA|   CA| 90000|\n",
+            "|  Michael|    Rose|    USA|   NY|120000|\n",
+            "|   Robert|Williams|    USA|   CA| 95000|\n",
+            "|    Maria|   Jones|    USA|   FL| 88000|\n",
+            "|      Jen|   Brown|    USA|   NY| 99000|\n",
+            "+---------+--------+-------+-----+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select(['firstname', 'state', 'salary']).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "PjQQdk9LLSTk",
+        "outputId": "a8f66607-2c13-46c6-f7da-1b52babb1601"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+-----+------+\n",
+            "|firstname|state|salary|\n",
+            "+---------+-----+------+\n",
+            "|    James|   CA| 90000|\n",
+            "|  Michael|   NY|120000|\n",
+            "|   Robert|   CA| 95000|\n",
+            "|    Maria|   FL| 88000|\n",
+            "|      Jen|   NY| 99000|\n",
+            "+---------+-----+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark.sql('SELECT firstname, state, salary FROM Exams').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-WhPvy_cLWe-",
+        "outputId": "05c93bb5-a51f-43e5-981c-3cafb74e9d7e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+-----+------+\n",
+            "|firstname|state|salary|\n",
+            "+---------+-----+------+\n",
+            "|    James|   CA| 90000|\n",
+            "|  Michael|   NY|120000|\n",
+            "|   Robert|   CA| 95000|\n",
+            "|    Maria|   FL| 88000|\n",
+            "|      Jen|   NY| 99000|\n",
+            "+---------+-----+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select('firstname').where(\"state=='AZ'\").show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jOtFae7NLbQO",
+        "outputId": "1bfb780b-c648-4dc0-aaca-cc855ebb3301"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+\n",
+            "|firstname|\n",
+            "+---------+\n",
+            "+---------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark.sql('SELECT firstname FROM Exams WHERE state == \"AZ\"').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hdw7aOnsLlbd",
+        "outputId": "2c4f813a-05f1-4554-a6f2-586521540dde"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+\n",
+            "|firstname|\n",
+            "+---------+\n",
+            "+---------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. Write a program to demonstrate Pyspark SQL expr() function"
+      ],
+      "metadata": {
+        "id": "BjMZl6HFLwhd"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import expr, col"
+      ],
+      "metadata": {
+        "id": "aJQg3gKnL5Ni"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "w_wdVr29MDf9"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"James\", \"Smith\", \"USA\", \"CA\", 90000, 1989),\n",
+        "    (\"Michael\", \"Rose\", \"USA\", \"NY\", 120000, 1999),\n",
+        "    (\"Robert\", \"Williams\", \"USA\", \"CA\", 95000, 1992),\n",
+        "    (\"Maria\", \"Jones\", \"USA\", \"FL\", 88000, 1994),\n",
+        "    (\"Jen\", \"Brown\", \"USA\", \"NY\", 99000, 1999)\n",
+        "]\n",
+        "cols = [\"firstname\", \"lastname\", \"country\", \"state\", \"salary\", \"JoinYear\"]"
+      ],
+      "metadata": {
+        "id": "EPdTlzUFMHJj"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data, cols)"
+      ],
+      "metadata": {
+        "id": "94lJngqHMb5R"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.withColumn('salary', expr('''CASE WHEN salary > 100000 THEN \"High\"\n",
+        "                                    WHEN salary = 90000 THEN \"Medium\"\n",
+        "                                    ELSE \"Low\" END''')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wRlLTBgiOydS",
+        "outputId": "5937f989-f9a3-46d4-955d-892196d68bf5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+-------+-----+------+--------+\n",
+            "|firstname|lastname|country|state|salary|JoinYear|\n",
+            "+---------+--------+-------+-----+------+--------+\n",
+            "|    James|   Smith|    USA|   CA|Medium|    1989|\n",
+            "|  Michael|    Rose|    USA|   NY|  High|    1999|\n",
+            "|   Robert|Williams|    USA|   CA|   Low|    1992|\n",
+            "|    Maria|   Jones|    USA|   FL|   Low|    1994|\n",
+            "|      Jen|   Brown|    USA|   NY|   Low|    1999|\n",
+            "+---------+--------+-------+-----+------+--------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select('firstname', 'lastname', expr('2025 - JoinYear').alias('Tenure')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8qnCmV2mPE_a",
+        "outputId": "4202c2be-7061-462d-be16-81a605852437"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+------+\n",
+            "|firstname|lastname|Tenure|\n",
+            "+---------+--------+------+\n",
+            "|    James|   Smith|    36|\n",
+            "|  Michael|    Rose|    26|\n",
+            "|   Robert|Williams|    33|\n",
+            "|    Maria|   Jones|    31|\n",
+            "|      Jen|   Brown|    26|\n",
+            "+---------+--------+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. Write a program to demonstrate Pypspark Select Columns from DataFrame"
+      ],
+      "metadata": {
+        "id": "Ma6FYsDjPWP0"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.functions import col"
+      ],
+      "metadata": {
+        "id": "FkFhP8tiPiVJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName('Exams').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "WulMxL1AQCth"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [\n",
+        "    (\"James\", \"Smith\", \"USA\", \"CA\", 90000, 1989),\n",
+        "    (\"Michael\", \"Rose\", \"USA\", \"NY\", 120000, 1999),\n",
+        "    (\"Robert\", \"Williams\", \"USA\", \"CA\", 95000, 1992),\n",
+        "    (\"Maria\", \"Jones\", \"USA\", \"FL\", 88000, 1994),\n",
+        "    (\"Jen\", \"Brown\", \"USA\", \"NY\", 99000, 1999)\n",
+        "]\n",
+        "cols = [\"firstname\", \"lastname\", \"country\", \"state\", \"salary\", \"JoinYear\"]"
+      ],
+      "metadata": {
+        "id": "XFsRqWTLQG6E"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = spark.createDataFrame(data, cols)"
+      ],
+      "metadata": {
+        "id": "KTDgM3gPQMtq"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select(\"firstname\").show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Ue1ycLztQRKF",
+        "outputId": "f308033f-267a-48d6-9bcf-5b2a4effc9b5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+\n",
+            "|firstname|\n",
+            "+---------+\n",
+            "|    James|\n",
+            "|  Michael|\n",
+            "|   Robert|\n",
+            "|    Maria|\n",
+            "|      Jen|\n",
+            "+---------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select(\"firstname\", 'lastname').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SffuR72LQTUW",
+        "outputId": "d6b9b719-de58-48c8-f4c5-f97183652fd9"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+\n",
+            "|firstname|lastname|\n",
+            "+---------+--------+\n",
+            "|    James|   Smith|\n",
+            "|  Michael|    Rose|\n",
+            "|   Robert|Williams|\n",
+            "|    Maria|   Jones|\n",
+            "|      Jen|   Brown|\n",
+            "+---------+--------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select(col('firstname'), col('lastname')).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Dc_4cuaUQW0P",
+        "outputId": "46f7d623-becb-40b9-e620-91361d21ba74"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+\n",
+            "|firstname|lastname|\n",
+            "+---------+--------+\n",
+            "|    James|   Smith|\n",
+            "|  Michael|    Rose|\n",
+            "|   Robert|Williams|\n",
+            "|    Maria|   Jones|\n",
+            "|      Jen|   Brown|\n",
+            "+---------+--------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.select('firstname', 'lastname').where('salary > 100000').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "l5J4weaKQcqY",
+        "outputId": "31f6530b-119b-4b58-b1b3-27be7087865b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------+\n",
+            "|firstname|lastname|\n",
+            "+---------+--------+\n",
+            "|  Michael|    Rose|\n",
+            "+---------+--------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "LH-0P_zZQh5N"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "YmCfhOailhcO"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Practical 9"
+      ],
+      "metadata": {
+        "id": "uaAW1ZYwliWf"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### A. write a programme to demonstrate pyspark read csv"
+      ],
+      "metadata": {
+        "id": "Y3CpNcAAliR0"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F"
+      ],
+      "metadata": {
+        "id": "NjgyBCW-liL2"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"exams\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "9KzsND4zliHi"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark.read.csv(\"/content/orders_south_2016.csv\", inferSchema=True, header=True).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "OwHPFC6jl_1J",
+        "outputId": "2d57ef29-6912-4fbc-9b1a-de9cde0342c1"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+--------+--------+---------+--------+------+--------------+------+--------------+---------------+---------------+--------------+-----------+--------------------+---------+-------------+---------------+-----------+---------------+---------------+------------+--------------------+\n",
+            "|   Sales|Quantity|   Profit|Discount|Region|         State|Row ID|      Order ID|     Order Date|      Ship Date|     Ship Mode|Customer ID|       Customer Name|  Segment|      Country|           City|Postal Code|     Product ID|       Category|Sub-Category|        Product Name|\n",
+            "+--------+--------+---------+--------+------+--------------+------+--------------+---------------+---------------+--------------+-----------+--------------------+---------+-------------+---------------+-----------+---------------+---------------+------------+--------------------+\n",
+            "|957.5775|       5| -383.031|    0.45| South|       Florida|     4|US-2016-108966|10/11/2016 0:00|10/18/2016 0:00|Standard Class|   SO-20335|      Sean O'Donnell| Consumer|United States|Fort Lauderdale|      33311|FUR-TA-10000577|      Furniture|      Tables|Bretford CR4500 S...|\n",
+            "|  22.368|       2|   2.5164|     0.2| South|       Florida|     5|US-2016-108966|10/11/2016 0:00|10/18/2016 0:00|Standard Class|   SO-20335|      Sean O'Donnell| Consumer|United States|Fort Lauderdale|      33311|OFF-ST-10000760|Office Supplies|     Storage|Eldon Fold 'N Rol...|\n",
+            "| 831.936|       8|-114.3912|     0.2| South|     Tennessee|    73|US-2016-134026| 4/26/2016 0:00|  5/2/2016 0:00|Standard Class|   JE-15745|          Joel Eaton| Consumer|United States|        Memphis|      38109|FUR-CH-10000513|      Furniture|      Chairs|High-Back Leather...|\n",
+            "|   97.04|       2|    1.213|     0.2| South|     Tennessee|    74|US-2016-134026| 4/26/2016 0:00|  5/2/2016 0:00|Standard Class|   JE-15745|          Joel Eaton| Consumer|United States|        Memphis|      38109|FUR-FU-10003708|      Furniture| Furnishings|\"Tenex Traditiona...|\n",
+            "|  72.784|       1|  -18.196|     0.2| South|     Tennessee|    75|US-2016-134026| 4/26/2016 0:00|  5/2/2016 0:00|Standard Class|   JE-15745|          Joel Eaton| Consumer|United States|        Memphis|      38109|OFF-ST-10004123|Office Supplies|     Storage|Safco Industrial ...|\n",
+            "| 200.984|       7|  62.8075|     0.2| South|North Carolina|    84|CA-2016-149734|  9/3/2016 0:00|  9/8/2016 0:00|Standard Class|   JC-16105|     Julie Creighton|Corporate|United States|         Durham|      27707|OFF-EN-10000927|Office Supplies|   Envelopes|Jet-Pak Recycled ...|\n",
+            "| 157.794|       1|-115.7156|    17.0| South|     Tennessee|   119|US-2016-136476|  4/5/2016 0:00| 4/10/2016 0:00|Standard Class|   GG-14650|        Greg Guthrie|Corporate|United States|        Bristol|      37620|OFF-BI-10003650|Office Supplies|     Binders|GBC DocuBind 300 ...|\n",
+            "| 161.568|       2| -28.2744|     0.2| South|     Tennessee|   229|US-2016-145436| 2/28/2016 0:00|  3/4/2016 0:00|Standard Class|   VD-21670|   Valerie Dominguez| Consumer|United States|       Columbia|      38401|FUR-CH-10004860|      Furniture|      Chairs|Global Low Back T...|\n",
+            "| 389.696|       8|  43.8408|     0.2| South|     Tennessee|   230|US-2016-145436| 2/28/2016 0:00|  3/4/2016 0:00|Standard Class|   VD-21670|   Valerie Dominguez| Consumer|United States|       Columbia|      38401|FUR-CH-10004477|      Furniture|      Chairs|Global Push Butto...|\n",
+            "|375.4575|       3|-157.0095|    0.45| South|       Florida|   385|US-2016-168935|11/27/2016 0:00| 12/2/2016 0:00|Standard Class|   DO-13435|        Denny Ordway| Consumer|United States| Pembroke Pines|      33024|FUR-TA-10000617|      Furniture|      Tables|Hon Practical Fou...|\n",
+            "|  83.976|       3|  -1.0497|     0.2| South|       Florida|   386|US-2016-168935|11/27/2016 0:00| 12/2/2016 0:00|Standard Class|   DO-13435|        Denny Ordway| Consumer|United States| Pembroke Pines|      33024|TEC-AC-10002335|     Technology| Accessories|Logitech Media Ke...|\n",
+            "|  105.42|       2|  51.6558|     0.0| South|      Arkansas|   496|CA-2016-134782|12/27/2016 0:00|12/31/2016 0:00|Standard Class|   MD-17350|       Maribeth Dona| Consumer|United States|   Fayetteville|      72701|OFF-EN-10001434|Office Supplies|   Envelopes|Strathmore #10 En...|\n",
+            "|    2.74|       1|   0.7398|     0.0| South|       Georgia|   507|CA-2016-145352| 3/16/2016 0:00| 3/22/2016 0:00|Standard Class|   CM-12385|Christopher Martinez| Consumer|United States|        Atlanta|      30318|OFF-AR-10001662|Office Supplies|         Art|Rogers Handheld B...|\n",
+            "|    8.34|       3|   2.1684|     0.0| South|       Georgia|   508|CA-2016-145352| 3/16/2016 0:00| 3/22/2016 0:00|Standard Class|   CM-12385|Christopher Martinez| Consumer|United States|        Atlanta|      30318|OFF-AR-10003856|Office Supplies|         Art|          Newell 344|\n",
+            "|   46.74|       3|   11.685|     0.0| South|       Georgia|   509|CA-2016-145352| 3/16/2016 0:00| 3/22/2016 0:00|Standard Class|   CM-12385|Christopher Martinez| Consumer|United States|        Atlanta|      30318|OFF-ST-10001228|Office Supplies|     Storage|Personal File Box...|\n",
+            "| 6354.95|       5| 3177.475|     0.0| South|       Georgia|   510|CA-2016-145352| 3/16/2016 0:00| 3/22/2016 0:00|Standard Class|   CM-12385|Christopher Martinez| Consumer|United States|        Atlanta|      30318|OFF-BI-10003527|Office Supplies|     Binders|Fellowes PB500 El...|\n",
+            "|  152.94|       3|  41.2938|     0.0| South|      Kentucky|   539|CA-2016-134894| 12/7/2016 0:00|12/11/2016 0:00|Standard Class|   DK-12985|      Darren Koutras| Consumer|United States|      Henderson|      42420|OFF-AP-10001271|Office Supplies|  Appliances|Eureka The Boss C...|\n",
+            "|  283.92|       4|    70.98|     0.0| South|      Kentucky|   540|CA-2016-134894| 12/7/2016 0:00|12/11/2016 0:00|Standard Class|   DK-12985|      Darren Koutras| Consumer|United States|      Henderson|      42420|FUR-CH-10002647|      Furniture|      Chairs|Situations Contou...|\n",
+            "|   70.98|       1|   4.9686|     0.0| South|      Kentucky|   587|CA-2016-128139|  7/3/2016 0:00|  7/9/2016 0:00|Standard Class|   BD-11725|    Bruce Degenhardt| Consumer|United States|       Richmond|      40475|FUR-CH-10003956|      Furniture|      Chairs|Novimex High-Tech...|\n",
+            "|  294.93|       3| 144.5157|     0.0| South|      Kentucky|   588|CA-2016-128139|  7/3/2016 0:00|  7/9/2016 0:00|Standard Class|   BD-11725|    Bruce Degenhardt| Consumer|United States|       Richmond|      40475|OFF-LA-10003930|Office Supplies|      Labels|Dot Matrix Printe...|\n",
+            "+--------+--------+---------+--------+------+--------------+------+--------------+---------------+---------------+--------------+-----------+--------------------+---------+-------------+---------------+-----------+---------------+---------------+------------+--------------------+\n",
+            "only showing top 20 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### B. write a programme to demonstrate pyspark read and write parquet file"
+      ],
+      "metadata": {
+        "id": "VmtPP393mQyQ"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession"
+      ],
+      "metadata": {
+        "id": "1Cj3zH_7mt-L"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"exams\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "z2KV14PEm-CD"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = [(1, \"Arjun\", 4000.0), (2, \"Neha\", 5000.5)]\n",
+        "df = spark.createDataFrame(data, [\"id\", \"name\", \"salary\"])"
+      ],
+      "metadata": {
+        "id": "Zfhg23SMnBEc"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "out_path = '/tmp/quick_parquet_demo'\n",
+        "df.write.mode('overwrite').parquet(out_path)"
+      ],
+      "metadata": {
+        "id": "7Vw1bXT9nT_n"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark.read.parquet(out_path).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "HTJfuawNnWaC",
+        "outputId": "2e0b6c82-3b27-4146-e400-14168e8bbd31"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-----+------+\n",
+            "| id| name|salary|\n",
+            "+---+-----+------+\n",
+            "|  1|Arjun|4000.0|\n",
+            "|  2| Neha|5000.5|\n",
+            "+---+-----+------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### C. write a program to demostratre spark ML Lib in python to train a linear regression model"
+      ],
+      "metadata": {
+        "id": "1__Dw9BXnWW-"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql import functions as F\n",
+        "from pyspark.ml.feature import VectorAssembler\n",
+        "from pyspark.ml.regression import LinearRegression\n",
+        "from pyspark.ml.evaluation import RegressionEvaluator"
+      ],
+      "metadata": {
+        "id": "yy-dALWznWTn"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "spark = SparkSession.builder.appName(\"LinearRegressionDemo\").getOrCreate()\n",
+        "\n",
+        "# 1) Sample data: y ~ 3*x1 + 2*x2 + noise\n",
+        "data = [(float(i), float(i % 7), 3.0*float(i) + 2.0*float(i % 7) + (i % 3 - 1)) for i in range(1, 51)]\n",
+        "df = spark.createDataFrame(data, [\"x1\", \"x2\", \"y\"])"
+      ],
+      "metadata": {
+        "id": "s6VulIu6nWQa"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "train_df, test_df = df.randomSplit([0.8, 0.2], seed = 42)"
+      ],
+      "metadata": {
+        "id": "NYAb8XyRnWMp"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "assembler = VectorAssembler(inputCols=['x1', 'x2'], outputCol='features')\n",
+        "lr = LinearRegression(featuresCol='features', labelCol='y', predictionCol='prediction')"
+      ],
+      "metadata": {
+        "id": "BDC-GVXbofSf"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "model = lr.fit(assembler.transform(train_df))\n",
+        "pred = model.transform(assembler.transform(test_df))"
+      ],
+      "metadata": {
+        "id": "7nTZ1rH-owoL"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "evaluation = RegressionEvaluator(labelCol='y', predictionCol='prediction', metricName='rmse')\n",
+        "print(\"RMSE Score:- \", evaluation.evaluate(pred))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "0ltXBQsGo3Jl",
+        "outputId": "40ded675-d6c5-46be-a3c8-a800717bc58c"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "RMSE Score:-  0.9946726351592328\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "GDDnUCE6pP0Z"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
